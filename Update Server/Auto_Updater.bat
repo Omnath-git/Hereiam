@@ -1,0 +1,2 @@
+ssh -i "C:\YourKeyPath.key" ubuntu@161.118.191.181 "cd ~/hereiam_portal/hereiam && git fetch --all && git reset --hard origin/master && sudo pkill gunicorn && source ../venv/bin/activate && gunicorn --workers 3 --bind 127.0.0.1:8000 'app:create_app()' --daemon && sudo systemctl restart nginx"
+pause

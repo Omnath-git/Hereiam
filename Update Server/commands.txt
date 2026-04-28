@@ -1,0 +1,8 @@
+cd ~/hereiam_portal/hereiam
+source ../venv/bin/activate
+git fetch --all
+git reset --hard origin/master
+sudo pkill gunicorn
+gunicorn --workers 3 --bind 127.0.0.1:8000 "app:create_app()" --daemon
+sudo systemctl restart nginx
+exit
