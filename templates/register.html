@@ -1,0 +1,987 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Professionals Data Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       REGISTER PAGE SPECIFIC STYLES
+       ============================================================ */
+    
+    .register-container {
+        min-height: calc(100vh - var(--navbar-height) - 40px);
+        display: flex;
+        align-items: center;
+        padding: 40px 0;
+    }
+    
+    /* Register Card */
+    .register-card {
+        border: none;
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        background: var(--white);
+    }
+    
+    /* Card Header */
+    .register-header {
+        background: var(--gradient-dark);
+        padding: 32px 32px 24px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .register-header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .register-header-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        font-size: 1.8rem;
+        color: var(--white);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+    
+    .register-header h2 {
+        color: var(--white);
+        font-weight: 800;
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+    }
+    
+    .register-header p {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    /* Card Body */
+    .register-body {
+        padding: 32px;
+    }
+    
+    /* User Type Selector */
+    .user-type-selector {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    
+    .user-type-option {
+        flex: 1;
+        position: relative;
+    }
+    
+    .user-type-option input[type="radio"] {
+        display: none;
+    }
+    
+    .user-type-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 16px;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        transition: all var(--transition-base);
+        background: var(--white);
+        text-align: center;
+    }
+    
+    .user-type-option label:hover {
+        border-color: var(--primary-light);
+        background: var(--primary-bg);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .user-type-option input[type="radio"]:checked + label {
+        border-color: var(--primary);
+        background: var(--primary-bg);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+    }
+    
+    .user-type-option .type-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        transition: all var(--transition-base);
+    }
+    
+    .type-icon.jobseeker {
+        background: var(--info-light);
+        color: var(--info-dark);
+    }
+    
+    .type-icon.employer {
+        background: var(--success-light);
+        color: var(--success-dark);
+    }
+    
+    .user-type-option input[type="radio"]:checked + label .type-icon.jobseeker {
+        background: var(--info);
+        color: var(--white);
+    }
+    
+    .user-type-option input[type="radio"]:checked + label .type-icon.employer {
+        background: var(--success);
+        color: var(--white);
+    }
+    
+    .user-type-option .type-label {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--gray-700);
+    }
+    
+    .user-type-option .type-desc {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-weight: 400;
+    }
+    
+    .user-type-option .type-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--primary-gradient);
+        color: var(--white);
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        opacity: 0;
+        transform: scale(0.8);
+        transition: all var(--transition-base);
+    }
+    
+    .user-type-option input[type="radio"]:checked + label .type-badge {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    /* Employer Fields */
+    .employer-fields {
+        display: none;
+        animation: slideDown 0.3s ease;
+    }
+    
+    .employer-fields.show {
+        display: block;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Form Controls */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--gray-700);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control,
+    .form-select {
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--gray-800);
+        transition: all var(--transition-fast);
+        background: var(--gray-50);
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        background: var(--white);
+        outline: none;
+    }
+    
+    .form-control::placeholder {
+        color: var(--gray-400);
+        font-weight: 400;
+    }
+    
+    .form-control.error {
+        border-color: var(--danger);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+    
+    .error-message {
+        color: var(--danger);
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-top: 4px;
+        display: none;
+    }
+    
+    .error-message.show {
+        display: block;
+        animation: slideDown 0.2s ease;
+    }
+    
+    /* Input Group with Icons */
+    .input-icon-group {
+        position: relative;
+    }
+    
+    .input-icon-group .form-control {
+        padding-left: 44px;
+    }
+    
+    .input-icon-group .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-400);
+        font-size: 1rem;
+        transition: color var(--transition-fast);
+        pointer-events: none;
+    }
+    
+    .input-icon-group .form-control:focus ~ .input-icon {
+        color: var(--primary);
+    }
+    
+    /* Password Strength */
+    .password-strength {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+    }
+    
+    .strength-bar {
+        flex: 1;
+        height: 4px;
+        background: var(--gray-200);
+        border-radius: var(--radius-full);
+        transition: all var(--transition-base);
+    }
+    
+    .strength-bar.active.weak { background: var(--danger); }
+    .strength-bar.active.medium { background: var(--warning); }
+    .strength-bar.active.strong { background: var(--success); }
+    
+    .strength-text {
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-top: 4px;
+        text-align: right;
+    }
+    
+    /* Submit Button */
+    .btn-register {
+        width: 100%;
+        padding: 14px 24px;
+        background: var(--primary-gradient);
+        color: var(--white);
+        border: none;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.3px;
+        transition: all var(--transition-base);
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-register::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+    }
+    
+    .btn-register:hover::before {
+        left: 100%;
+    }
+    
+    .btn-register:active {
+        transform: translateY(0);
+    }
+    
+    .btn-register:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Divider */
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--gray-200);
+    }
+    
+    .divider span {
+        font-size: 0.8rem;
+        color: var(--gray-500);
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    /* Social Login Buttons */
+    .social-login {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .btn-social {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        border: 2px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        background: var(--white);
+        color: var(--gray-700);
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all var(--transition-base);
+        cursor: pointer;
+    }
+    
+    .btn-social:hover {
+        border-color: var(--gray-300);
+        background: var(--gray-50);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-social.google:hover { border-color: #ea4335; color: #ea4335; }
+    .btn-social.linkedin:hover { border-color: #0077b5; color: #0077b5; }
+    .btn-social.github:hover { border-color: #333; color: #333; }
+    
+    /* Footer */
+    .register-footer {
+        text-align: center;
+        margin-top: 24px;
+        padding-top: 24px;
+        border-top: 1px solid var(--gray-100);
+    }
+    
+    .register-footer p {
+        color: var(--gray-500);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .register-footer a {
+        color: var(--primary);
+        font-weight: 700;
+    }
+    
+    .register-footer a:hover {
+        color: var(--primary-dark);
+    }
+    
+    /* Benefits Section */
+    .benefits-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .benefit-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.8rem;
+        color: var(--gray-600);
+        font-weight: 500;
+    }
+    
+    .benefit-item i {
+        color: var(--success);
+        font-size: 0.9rem;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .register-card {
+            border-radius: var(--radius-lg);
+        }
+        
+        .register-header {
+            padding: 24px 20px 20px;
+        }
+        
+        .register-body {
+            padding: 20px;
+        }
+        
+        .user-type-selector {
+            flex-direction: column;
+        }
+        
+        .social-login {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9 col-sm-11">
+                
+                <!-- Register Card -->
+                <div class="register-card">
+                    
+                    <!-- Card Header -->
+                    <div class="register-header">
+                        <div class="register-header-content">
+                            <div class="register-header-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <h2>Create Your Account</h2>
+                            <p>Join thousands of professionals on our platform</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="register-body">
+                        
+                        <!-- Benefits -->
+                        <div class="benefits-list">
+                            <span class="benefit-item">
+                                <i class="fas fa-check-circle"></i> Free Forever
+                            </span>
+                            <span class="benefit-item">
+                                <i class="fas fa-check-circle"></i> AI-Powered CV Parser
+                            </span>
+                            <span class="benefit-item">
+                                <i class="fas fa-check-circle"></i> Professional Profile Page
+                            </span>
+                            <span class="benefit-item">
+                                <i class="fas fa-check-circle"></i> Job Matching
+                            </span>
+                        </div>
+                        
+                        <!-- Registration Form -->
+                        <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm" novalidate>
+                            
+                            <!-- ⭐ USER TYPE SELECTOR -->
+                            <div class="user-type-selector" id="userTypeSelector">
+                                <div class="user-type-option">
+                                    <input type="radio" name="user_type" id="typeJobseeker" value="jobseeker" checked>
+                                    <label for="typeJobseeker">
+                                        <span class="type-badge">Popular</span>
+                                        <div class="type-icon jobseeker">
+                                            <i class="fas fa-user-graduate"></i>
+                                        </div>
+                                        <span class="type-label">Job Seeker</span>
+                                        <span class="type-desc">Find your dream job</span>
+                                    </label>
+                                </div>
+                                <div class="user-type-option">
+                                    <input type="radio" name="user_type" id="typeEmployer" value="employer">
+                                    <label for="typeEmployer">
+                                        <span class="type-badge">Hiring</span>
+                                        <div class="type-icon employer">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <span class="type-label">Employer</span>
+                                        <span class="type-desc">Post jobs & hire talent</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Full Name -->
+                            <div class="mb-3">
+                                <label class="form-label">Full Name *</label>
+                                <div class="input-icon-group">
+                                    <input type="text" 
+                                           name="full_name" 
+                                           class="form-control" 
+                                           placeholder="Enter your full name"
+                                           required
+                                           minlength="3"
+                                           id="fullName">
+                                    <i class="fas fa-user input-icon"></i>
+                                </div>
+                                <div class="error-message" id="fullNameError">Please enter your full name (minimum 3 characters)</div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="mb-3">
+                                <label class="form-label">Email Address *</label>
+                                <div class="input-icon-group">
+                                    <input type="email" 
+                                           name="email" 
+                                           class="form-control" 
+                                           placeholder="your.email@example.com"
+                                           required
+                                           id="email">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                </div>
+                                <div class="error-message" id="emailError">Please enter a valid email address</div>
+                            </div>
+                            
+                            <!-- Mobile Number -->
+                            <div class="mb-3">
+                                <label class="form-label">Mobile Number *</label>
+                                <div class="input-icon-group">
+                                    <input type="tel" 
+                                           name="mobile" 
+                                           class="form-control" 
+                                           placeholder="10-digit mobile number"
+                                           pattern="[0-9]{10}"
+                                           maxlength="10"
+                                           required
+                                           id="mobile">
+                                    <i class="fas fa-mobile-alt input-icon"></i>
+                                </div>
+                                <div class="error-message" id="mobileError">Please enter a valid 10-digit mobile number</div>
+                            </div>
+                            
+                            <!-- Domain / Profession -->
+                            <div class="mb-3">
+                                <label class="form-label" id="domainLabel">Profession / Domain *</label>
+                                <div class="input-icon-group">
+                                    <input type="text" 
+                                           name="domain" 
+                                           class="form-control" 
+                                           placeholder="e.g., Software Developer, Data Scientist"
+                                           required
+                                           id="domain">
+                                    <i class="fas fa-briefcase input-icon"></i>
+                                </div>
+                                <div class="error-message" id="domainError">Please enter your profession or domain</div>
+                            </div>
+                            
+                            <!-- City & State -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">City *</label>
+                                    <input type="text" 
+                                           name="city" 
+                                           class="form-control" 
+                                           placeholder="e.g., Mumbai"
+                                           required
+                                           id="city">
+                                    <div class="error-message" id="cityError">Please enter your city</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">State *</label>
+                                    <input type="text" 
+                                           name="state" 
+                                           class="form-control" 
+                                           placeholder="e.g., Maharashtra"
+                                           required
+                                           id="state">
+                                    <div class="error-message" id="stateError">Please enter your state</div>
+                                </div>
+                            </div>
+                            
+                            <!-- ⭐ EMPLOYER FIELDS (Hidden by default) -->
+                            <div class="employer-fields" id="employerFields">
+                                <div class="mb-3">
+                                    <label class="form-label">Company Name *</label>
+                                    <div class="input-icon-group">
+                                        <input type="text" 
+                                               name="company_name" 
+                                               class="form-control employer-input" 
+                                               placeholder="Enter your company name"
+                                               id="companyName">
+                                        <i class="fas fa-building input-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Company Website</label>
+                                    <div class="input-icon-group">
+                                        <input type="url" 
+                                               name="company_website" 
+                                               class="form-control employer-input" 
+                                               placeholder="https://yourcompany.com"
+                                               id="companyWebsite">
+                                        <i class="fas fa-globe input-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label class="form-label">Password *</label>
+                                <div class="input-icon-group">
+                                    <input type="password" 
+                                           name="password" 
+                                           class="form-control" 
+                                           placeholder="Create a strong password"
+                                           required
+                                           minlength="6"
+                                           id="password">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <button type="button" class="input-icon" style="left: auto; right: 14px; cursor: pointer; background: none; border: none;" 
+                                            onclick="togglePassword()" id="togglePasswordBtn">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength" id="passwordStrength">
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                    <div class="strength-bar"></div>
+                                </div>
+                                <div class="strength-text" id="strengthText"></div>
+                                <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
+                            </div>
+                            <div class="mb-3">
+    <label class="form-label fw-bold">
+        <i class="fas fa-shield-alt me-2" style="color: #8b5cf6;"></i>Privacy Settings
+    </label>
+    <div class="card bg-light p-3">
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="showEmail" name="show_email">
+            <label class="form-check-label" for="showEmail">
+                <i class="fas fa-envelope me-1"></i> Show email on my public profile
+            </label>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="showMobile" name="show_mobile">
+            <label class="form-check-label" for="showMobile">
+                <i class="fas fa-phone me-1"></i> Show mobile number on my public profile
+            </label>
+        </div>
+        <small class="text-muted mt-2 d-block">
+            <i class="fas fa-info-circle me-1"></i>
+            If hidden, your contact info will be masked (e.g., exa***@gmail.com)
+        </small>
+    </div>
+</div>
+                            <!-- Terms Checkbox -->
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                                <label class="form-check-label small" for="termsCheck">
+                                    I agree to the <a href="#" target="_blank">Terms of Service</a> and 
+                                    <a href="#" target="_blank">Privacy Policy</a>
+                                </label>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-register" id="registerBtn">
+                                <i class="fas fa-rocket me-2"></i>Create Free Account
+                            </button>
+                        </form>
+                        
+                        <!-- Divider -->
+                        <div class="divider">
+                            <span>or sign up with</span>
+                        </div>
+                        
+                        <!-- Social Login -->
+                        <div class="social-login">
+                            <button type="button" class="btn-social google" onclick="alert('Coming soon!')">
+                                <i class="fab fa-google"></i> Google
+                            </button>
+                            <button type="button" class="btn-social linkedin" onclick="alert('Coming soon!')">
+                                <i class="fab fa-linkedin-in"></i> LinkedIn
+                            </button>
+                            <button type="button" class="btn-social github" onclick="alert('Coming soon!')">
+                                <i class="fab fa-github"></i> GitHub
+                            </button>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="register-footer">
+                            <p>
+                                Already have an account? 
+                                <a href="{{ url_for('auth.login') }}">
+                                    Sign In <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </p>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ============================================================
+    // USER TYPE TOGGLE
+    // ============================================================
+    const typeJobseeker = document.getElementById('typeJobseeker');
+    const typeEmployer = document.getElementById('typeEmployer');
+    const employerFields = document.getElementById('employerFields');
+    const domainLabel = document.getElementById('domainLabel');
+    const domainInput = document.getElementById('domain');
+    const companyNameInput = document.getElementById('companyName');
+    const companyWebsiteInput = document.getElementById('companyWebsite');
+    
+    function toggleEmployerFields() {
+        if (typeEmployer.checked) {
+            employerFields.classList.add('show');
+            domainLabel.textContent = 'Industry / Sector *';
+            domainInput.placeholder = 'e.g., Information Technology, Healthcare';
+            companyNameInput.setAttribute('required', 'required');
+        } else {
+            employerFields.classList.remove('show');
+            domainLabel.textContent = 'Profession / Domain *';
+            domainInput.placeholder = 'e.g., Software Developer, Data Scientist';
+            companyNameInput.removeAttribute('required');
+        }
+    }
+    
+    typeJobseeker.addEventListener('change', toggleEmployerFields);
+    typeEmployer.addEventListener('change', toggleEmployerFields);
+    
+    // ============================================================
+    // PASSWORD TOGGLE
+    // ============================================================
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const icon = toggleBtn.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    
+    // ============================================================
+    // PASSWORD STRENGTH METER
+    // ============================================================
+    const passwordInput = document.getElementById('password');
+    const strengthBars = document.querySelectorAll('.strength-bar');
+    const strengthText = document.getElementById('strengthText');
+    
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        let strength = 0;
+        
+        if (password.length >= 6) strength++;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        // Reset bars
+        strengthBars.forEach(bar => {
+            bar.classList.remove('active', 'weak', 'medium', 'strong');
+        });
+        
+        // Set bars based on strength
+        const colors = ['weak', 'weak', 'medium', 'strong', 'strong'];
+        const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+        
+        for (let i = 0; i < Math.min(strength, 4); i++) {
+            strengthBars[i].classList.add('active', colors[strength - 1] || 'weak');
+        }
+        
+        if (strength > 0) {
+            strengthText.textContent = labels[strength];
+            strengthText.style.color = 
+                strength <= 2 ? 'var(--danger)' : 
+                strength === 3 ? 'var(--warning)' : 
+                'var(--success)';
+        } else {
+            strengthText.textContent = '';
+        }
+    });
+    
+    // ============================================================
+    // FORM VALIDATION
+    // ============================================================
+    const registerForm = document.getElementById('registerForm');
+    
+    function showError(fieldId, errorId) {
+        document.getElementById(fieldId).classList.add('error');
+        document.getElementById(errorId).classList.add('show');
+    }
+    
+    function hideError(fieldId, errorId) {
+        document.getElementById(fieldId).classList.remove('error');
+        document.getElementById(errorId).classList.remove('show');
+    }
+    
+    // Real-time validation
+    document.getElementById('fullName').addEventListener('input', function() {
+        if (this.value.length >= 3) hideError('fullName', 'fullNameError');
+    });
+    
+    document.getElementById('email').addEventListener('input', function() {
+        if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value)) hideError('email', 'emailError');
+    });
+    
+    document.getElementById('mobile').addEventListener('input', function() {
+        if (/^\d{10}$/.test(this.value)) hideError('mobile', 'mobileError');
+    });
+    
+    document.getElementById('password').addEventListener('input', function() {
+        if (this.value.length >= 6) hideError('password', 'passwordError');
+    });
+    
+    registerForm.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        // Validate Full Name
+        const fullName = document.getElementById('fullName');
+        if (fullName.value.trim().length < 3) {
+            showError('fullName', 'fullNameError');
+            isValid = false;
+        }
+        
+        // Validate Email
+        const email = document.getElementById('email');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+            showError('email', 'emailError');
+            isValid = false;
+        }
+        
+        // Validate Mobile
+        const mobile = document.getElementById('mobile');
+        if (!/^\d{10}$/.test(mobile.value)) {
+            showError('mobile', 'mobileError');
+            isValid = false;
+        }
+        
+        // Validate Domain
+        const domain = document.getElementById('domain');
+        if (domain.value.trim().length < 2) {
+            showError('domain', 'domainError');
+            isValid = false;
+        }
+        
+        // Validate City
+        const city = document.getElementById('city');
+        if (city.value.trim().length < 2) {
+            showError('city', 'cityError');
+            isValid = false;
+        }
+        
+        // Validate State
+        const state = document.getElementById('state');
+        if (state.value.trim().length < 2) {
+            showError('state', 'stateError');
+            isValid = false;
+        }
+        
+        // Validate Password
+        const password = document.getElementById('password');
+        if (password.value.length < 6) {
+            showError('password', 'passwordError');
+            isValid = false;
+        }
+        
+        // Validate Terms
+        const termsCheck = document.getElementById('termsCheck');
+        if (!termsCheck.checked) {
+            alert('Please agree to the Terms of Service and Privacy Policy');
+            isValid = false;
+        }
+        
+        // Validate Employer Fields
+        if (typeEmployer.checked) {
+            const companyName = document.getElementById('companyName');
+            if (companyName.value.trim().length < 2) {
+                alert('Please enter your company name');
+                companyName.focus();
+                isValid = false;
+            }
+        }
+        
+        if (!isValid) {
+            e.preventDefault();
+            // Scroll to first error
+            const firstError = document.querySelector('.form-control.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        } else {
+            // Show loading state
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        }
+    });
+    
+    // Initialize employer fields state
+    toggleEmployerFields();
+</script>
+{% endblock %}

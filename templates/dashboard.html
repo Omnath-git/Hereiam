@@ -1,0 +1,679 @@
+{% extends "base.html" %}
+
+{% block title %}Hereiam.in{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="card">
+                <div class="card-body text-center p-3">
+                    <div class="mb-3">
+                        {% if current_user and current_user.profile_photo %}
+                            <img src="{{ url_for('static', filename=current_user.profile_photo) }}" 
+                                 alt="{{ current_user.full_name }}" 
+                                 class="dashboard-avatar"
+                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
+                                 alt="Default Avatar" 
+                                 class="dashboard-avatar">
+                        {% endif %}
+                    </div>
+                    <h6 class="fw-bold mb-1" style="color: #1a1a2e;">{{ current_user.full_name if current_user else user.full_name }}</h6>
+                    <p class="text-muted small mb-2">{{ current_user.domain if current_user else user.domain }}</p>
+                    
+                    {% if session.user_type == 'employer' %}
+                        <span class="badge" style="background: #10b981; color: white;">
+                            <i class="fas fa-building me-1"></i>Employer
+                        </span>
+                    {% else %}
+                        <span class="badge" style="background: #8b5cf6; color: white;">
+                            <i class="fas fa-user-graduate me-1"></i>Professional
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body p-0">
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#overview" data-bs-toggle="tab">
+                            <i class="fas fa-tachometer-alt me-2"></i>Overview
+                        </a>
+                        <a class="nav-link" href="#profile" data-bs-toggle="tab">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                        
+                        {% if session.user_type == 'employer' %}
+                            <!-- ⭐ EMPLOYER LINKS -->
+                            <a class="nav-link" href="{{ url_for('jobs.post_job') }}">
+                                <i class="fas fa-plus-circle me-2"></i>Post New Job
+                            </a>
+                            <a class="nav-link" href="{{ url_for('jobs.my_jobs') }}">
+                                <i class="fas fa-briefcase me-2"></i>Manage Jobs
+                            </a>
+                        {% else %}
+                            <!-- ⭐ JOB SEEKER LINKS -->
+                            <a class="nav-link" href="{{ url_for('profile.edit_profile') }}">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
+                            </a>
+                            <a class="nav-link" href="{{ url_for('profile.upload_cv') }}">
+                                <i class="fas fa-upload me-2"></i>Upload/Update CV
+                            </a>
+                        {% endif %}
+                        
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 main-content">
+            
+            <!-- Welcome Banner -->
+            <div class="welcome-banner mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="fw-bold text-white mb-1">
+                            Welcome back, {{ current_user.full_name if current_user else user.full_name }}! 👋
+                        </h4>
+                        <p class="text-white-50 mb-0">
+                            {% if session.user_type == 'employer' %}
+                                Manage your job postings and find the best talent.
+                            {% else %}
+                                Here's what's happening with your profile today.
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-light text-dark px-3 py-2">
+                            <i class="fas fa-calendar me-1"></i> 
+                            {{ (current_user.created_at if current_user else user.created_at).strftime('%d %b, %Y') if (current_user if current_user else user).created_at else 'Today' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview">
+                    
+                    {% if session.user_type == 'employer' %}
+                    <!-- ⭐⭐⭐ EMPLOYER OVERVIEW ⭐⭐⭐ -->
+                    
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-views">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Active Jobs</p>
+                                            <h3 class="stats-number">{{ active_jobs|default(0) }}</h3>
+                                            <span class="stats-change positive">
+                                                <i class="fas fa-check-circle me-1"></i>Live
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-purple">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-score">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Total Jobs</p>
+                                            <h3 class="stats-number">{{ total_jobs|default(0) }}</h3>
+                                            <span class="stats-change neutral">
+                                                <i class="fas fa-list me-1"></i>Posted
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-orange">
+                                            <i class="fas fa-clipboard-list"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-skills">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Total Views</p>
+                                            <h3 class="stats-number">0</h3>
+                                            <span class="stats-change neutral">
+                                                <i class="fas fa-eye me-1"></i>Views
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-blue">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-experience">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Company</p>
+                                            <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">{{ current_user.company_name if current_user else user.company_name or 'N/A' }}</h6>
+                                            <span class="stats-change neutral">
+                                                <i class="fas fa-building me-1"></i>Verified
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-green">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions for Employer -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card quick-actions-card">
+                                <div class="card-body">
+                                    <h5 class="fw-bold mb-3" style="color: #1a1a2e;">
+                                        <i class="fas fa-bolt me-2" style="color: #f59e0b;"></i>
+                                        Quick Actions
+                                    </h5>
+                                    <div class="row g-2">
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('jobs.post_job') }}" class="quick-btn upload-btn">
+                                                <i class="fas fa-plus-circle"></i>
+                                                <span>Post New Job</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('jobs.my_jobs') }}" class="quick-btn edit-btn">
+                                                <i class="fas fa-list"></i>
+                                                <span>Manage Jobs</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('main.index', tab='professionals') }}" class="quick-btn view-btn">
+                                                <i class="fas fa-users"></i>
+                                                <span>Find Talent</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('main.index', tab='jobs') }}" class="quick-btn share-btn">
+                                                <i class="fas fa-search"></i>
+                                                <span>Browse Jobs</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Jobs Table -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="fw-bold" style="color: #1a1a2e;">
+                                            <i class="fas fa-briefcase me-2" style="color: #8b5cf6;"></i>
+                                            Your Recent Jobs
+                                        </h5>
+                                        <a href="{{ url_for('jobs.post_job') }}" class="btn btn-sm" style="background: #8b5cf6; color: white; border-radius: 20px;">
+                                            <i class="fas fa-plus me-1"></i> Post New Job
+                                        </a>
+                                    </div>
+                                    
+                                    {% if recent_jobs %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Job Title</th>
+                                                    <th>Location</th>
+                                                    <th>Posted Date</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for job in recent_jobs[:5] %}
+                                                <tr>
+                                                    <td class="fw-bold">{{ job.title }}</td>
+                                                    <td><i class="fas fa-map-marker-alt me-1 text-muted"></i>{{ job.location }}</td>
+                                                    <td>{{ job.posted_date.strftime('%d %b, %Y') if job.posted_date else 'N/A' }}</td>
+                                                    <td>
+                                                        {% if job.is_active %}
+                                                        <span class="badge bg-success">Active</span>
+                                                        {% else %}
+                                                        <span class="badge bg-secondary">Inactive</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ url_for('jobs.edit_job', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-briefcase fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No jobs posted yet</h5>
+                                        <p class="text-muted">Start posting jobs to find the best talent!</p>
+                                        <a href="{{ url_for('jobs.post_job') }}" class="btn btn-primary mt-2">
+                                            <i class="fas fa-plus-circle me-2"></i>Post Your First Job
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% else %}
+                    <!-- ⭐⭐⭐ JOB SEEKER OVERVIEW ⭐⭐⭐ -->
+                    
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-views">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Profile Views</p>
+                                            <h3 class="stats-number">464</h3>
+                                            <span class="stats-change positive">
+                                                <i class="fas fa-arrow-up me-1"></i>12% this week
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-purple">
+                                            <i class="fas fa-eye"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-score">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Profile Score</p>
+                                            <h3 class="stats-number">90%</h3>
+                                            <span class="stats-change positive">
+                                                <i class="fas fa-star me-1"></i>Excellent
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-orange">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-skills">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Skills Listed</p>
+                                            <h3 class="stats-number">12</h3>
+                                            <span class="stats-change neutral">
+                                                <i class="fas fa-cogs me-1"></i>Technologies
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-blue">
+                                            <i class="fas fa-tools"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-xl-3 col-md-6 mb-3">
+                            <div class="stats-card card-experience">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <p class="stats-label">Experience</p>
+                                            <h3 class="stats-number">{{ user.experience_years or 'N/A' }}</h3>
+                                            <span class="stats-change neutral">
+                                                <i class="fas fa-briefcase me-1"></i>Total
+                                            </span>
+                                        </div>
+                                        <div class="stats-icon-wrapper bg-green">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions for Job Seeker -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card quick-actions-card">
+                                <div class="card-body">
+                                    <h5 class="fw-bold mb-3" style="color: #1a1a2e;">
+                                        <i class="fas fa-bolt me-2" style="color: #f59e0b;"></i>
+                                        Quick Actions
+                                    </h5>
+                                    <div class="row g-2">
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('profile.edit_profile') }}" class="quick-btn edit-btn">
+                                                <i class="fas fa-edit"></i>
+                                                <span>Edit Profile</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('profile.upload_cv') }}" class="quick-btn upload-btn">
+                                                <i class="fas fa-upload"></i>
+                                                <span>Update CV</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            {% if user.profile_url %}
+                                            <a href="{{ url_for('main.view_profile', filename=user.profile_url) }}" target="_blank" class="quick-btn view-btn">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                <span>View Profile</span>
+                                            </a>
+                                            {% else %}
+                                            <a href="{{ url_for('profile.upload_cv') }}" class="quick-btn view-btn">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                                <span>Upload CV</span>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <a href="{{ url_for('main.index', tab='jobs') }}" class="quick-btn share-btn">
+                                                <i class="fas fa-search"></i>
+                                                <span>Find Jobs</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Completion & Chart -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card completion-card">
+                                <div class="card-body">
+                                    <h5 class="fw-bold mb-4" style="color: #1a1a2e;">
+                                        <i class="fas fa-tasks me-2" style="color: #8b5cf6;"></i>
+                                        Profile Completion
+                                    </h5>
+                                    
+                                    <div class="completion-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="completion-label">
+                                                <i class="fas fa-user-circle me-2" style="color: #3b82f6;"></i>Basic Information
+                                            </span>
+                                            <span class="badge" style="background: #d1fae5; color: #065f46;">Completed</span>
+                                        </div>
+                                        <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
+                                            <div class="progress-bar" style="width: 100%; background: #10b981; border-radius: 10px;"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="completion-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="completion-label">
+                                                <i class="fas fa-file-pdf me-2" style="color: #ef4444;"></i>CV Uploaded
+                                            </span>
+                                            {% if user.profile_complete %}
+                                            <span class="badge" style="background: #d1fae5; color: #065f46;">Completed</span>
+                                            {% else %}
+                                            <span class="badge" style="background: #fee2e2; color: #991b1b;">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
+                                            <div class="progress-bar" style="width: {{ '100' if user.profile_complete else '0' }}%; background: {{ '#10b981' if user.profile_complete else '#ef4444' }}; border-radius: 10px;"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="completion-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="completion-label">
+                                                <i class="fas fa-cogs me-2" style="color: #f59e0b;"></i>Skills Added
+                                            </span>
+                                            {% if user.skills and user.skills != '[]' %}
+                                            <span class="badge" style="background: #d1fae5; color: #065f46;">Completed</span>
+                                            {% else %}
+                                            <span class="badge" style="background: #fee2e2; color: #991b1b;">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
+                                            <div class="progress-bar" style="width: {{ '100' if (user.skills and user.skills != '[]') else '0' }}%; background: {{ '#10b981' if (user.skills and user.skills != '[]') else '#ef4444' }}; border-radius: 10px;"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="completion-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="completion-label">
+                                                <i class="fas fa-briefcase me-2" style="color: #8b5cf6;"></i>Experience Added
+                                            </span>
+                                            {% if user.experience and user.experience != '[]' %}
+                                            <span class="badge" style="background: #d1fae5; color: #065f46;">Completed</span>
+                                            {% else %}
+                                            <span class="badge" style="background: #fee2e2; color: #991b1b;">Pending</span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
+                                            <div class="progress-bar" style="width: {{ '100' if (user.experience and user.experience != '[]') else '0' }}%; background: {{ '#10b981' if (user.experience and user.experience != '[]') else '#ef4444' }}; border-radius: 10px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card chart-card">
+                                <div class="card-body">
+                                    <h5 class="fw-bold" style="color: #1a1a2e;">
+                                        <i class="fas fa-chart-line me-2" style="color: #3b82f6;"></i>
+                                        Weekly Profile Views
+                                    </h5>
+                                    <div style="position: relative; height: 280px;">
+                                        <canvas id="profileChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+                
+                <!-- Profile Tab -->
+                <div class="tab-pane fade" id="profile">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="fw-bold mb-4" style="color: #1a1a2e;">
+                                <i class="fas fa-user me-2" style="color: #8b5cf6;"></i>
+                                {% if session.user_type == 'employer' %}
+                                    Company Details
+                                {% else %}
+                                    My Profile Details
+                                {% endif %}
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table profile-table">
+                                    <tr><td class="label-col">Name</td><td class="value-col">{{ current_user.full_name if current_user else user.full_name }}</td></tr>
+                                    <tr><td class="label-col">Email</td><td class="value-col">{{ current_user.email if current_user else user.email }}</td></tr>
+                                    <tr><td class="label-col">Mobile</td><td class="value-col">{{ current_user.mobile if current_user else user.mobile }}</td></tr>
+                                    
+                                    {% if session.user_type == 'employer' %}
+                                        <tr><td class="label-col">Company</td><td class="value-col">{{ current_user.company_name if current_user else user.company_name or 'Not specified' }}</td></tr>
+                                        <tr><td class="label-col">Website</td><td class="value-col">{{ current_user.company_website if current_user else user.company_website or 'Not specified' }}</td></tr>
+                                        <tr><td class="label-col">Industry</td><td class="value-col">{{ current_user.domain if current_user else user.domain }}</td></tr>
+                                        <tr><td class="label-col">Location</td><td class="value-col">{{ current_user.city if current_user else user.city }}, {{ current_user.state if current_user else user.state }}</td></tr>
+                                    {% else %}
+                                        <tr><td class="label-col">Domain</td><td class="value-col">{{ user.domain }}</td></tr>
+                                        <tr><td class="label-col">Experience</td><td class="value-col">{{ user.experience_years or 'Not specified' }}</td></tr>
+                                        <tr><td class="label-col">Location</td><td class="value-col">{{ user.city }}, {{ user.state }}</td></tr>
+                                        <tr><td class="label-col">Summary</td><td class="value-col">{{ user.summary or 'Not added yet' }}</td></tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+let profileChartInstance = null;
+
+function createProfileChart() {
+    const canvas = document.getElementById('profileChart');
+    if (!canvas) return;
+    
+    if (profileChartInstance) {
+        profileChartInstance.destroy();
+        profileChartInstance = null;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+    
+    profileChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Views',
+                data: [45, 52, 38, 60, 56, 42, 65],
+                fill: true,
+                backgroundColor: gradient,
+                borderColor: '#3b82f6',
+                borderWidth: 2,
+                tension: 0.4,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f3f4f6' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => createProfileChart(), 400);
+});
+
+document.querySelector('a[href="#overview"]')?.addEventListener('shown.bs.tab', function() {
+    setTimeout(() => { if (!profileChartInstance) createProfileChart(); }, 200);
+});
+</script>
+
+<style>
+/* Same styles as before... */
+.welcome-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 24px 30px;
+}
+.dashboard-avatar {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 3px solid #8b5cf6;
+    object-fit: cover;
+}
+.stats-card {
+    border: none; border-radius: 16px;
+    transition: all 0.3s;
+}
+.stats-card:hover { transform: translateY(-4px); }
+.card-views { background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border: 1px solid #ddd6fe; }
+.card-score { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border: 1px solid #fed7aa; }
+.card-skills { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1px solid #bfdbfe; }
+.card-experience { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border: 1px solid #bbf7d0; }
+.stats-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.card-views .stats-label { color: #7c3aed; }
+.card-score .stats-label { color: #ea580c; }
+.card-skills .stats-label { color: #2563eb; }
+.card-experience .stats-label { color: #059669; }
+.stats-number { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+.stats-change { font-size: 0.75rem; font-weight: 500; }
+.stats-change.positive { color: #059669; }
+.stats-change.neutral { color: #64748b; }
+.stats-icon-wrapper {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; color: white;
+}
+.bg-purple { background: #8b5cf6; }
+.bg-orange { background: #f97316; }
+.bg-blue { background: #3b82f6; }
+.bg-green { background: #10b981; }
+.quick-actions-card { border: none; border-radius: 16px; background: white; }
+.quick-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 16px 10px; border-radius: 12px; text-decoration: none;
+    border: 2px solid transparent; transition: all 0.3s; cursor: pointer;
+    width: 100%; text-align: center; font-weight: 500; font-size: 0.85rem;
+}
+.edit-btn { background: #f5f3ff; color: #7c3aed; border-color: #ddd6fe; }
+.edit-btn:hover { background: #8b5cf6; color: white; transform: translateY(-2px); }
+.upload-btn { background: #f0fdf4; color: #059669; border-color: #bbf7d0; }
+.upload-btn:hover { background: #10b981; color: white; transform: translateY(-2px); }
+.view-btn { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.view-btn:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
+.share-btn { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+.share-btn:hover { background: #f97316; color: white; transform: translateY(-2px); }
+.completion-card { border: none; border-radius: 16px; background: white; }
+.chart-card { border: none; border-radius: 16px; background: white; }
+.sidebar { padding-right: 15px; }
+.main-content { padding-left: 15px; }
+.nav-link { padding: 12px 20px; color: #64748b; transition: all 0.3s; border-left: 3px solid transparent; }
+.nav-link:hover { background: #f1f5f9; color: #8b5cf6; border-left-color: #8b5cf6; }
+.nav-link.active { background: #ede9fe; color: #7c3aed; font-weight: 600; border-left-color: #8b5cf6; }
+.profile-table .label-col { font-weight: 600; color: #374151; width: 150px; padding: 12px 15px; }
+.profile-table .value-col { color: #64748b; padding: 12px 15px; }
+@media (max-width: 768px) {
+    .sidebar { margin-bottom: 20px; }
+    .main-content { padding-left: 0; }
+}
+</style>
+{% endblock %}

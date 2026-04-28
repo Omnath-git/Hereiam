@@ -1,0 +1,21 @@
+D:\Hereiam.in V3\
+├── app.py                    # 30 lines (बहुत छोटा!)
+├── config.py                 # 12 lines
+├── models.py                 # 70 lines
+├── requirements.txt
+├── utils/
+│   ├── __init__.py
+│   ├── helpers.py            # Helper functions
+│   ├── cv_parser.py          # CV Parsing (सिर्फ CV logic)
+│   └── profile_generator.py  # HTML Generation
+├── blueprints/
+│   ├── __init__.py
+│   ├── auth.py               # Login/Register (सिर्फ auth)
+│   ├── profile.py            # CV/Profile routes
+│   ├── dashboard.py          # Dashboard route
+│   ├── jobs.py               # Job CRUD routes
+│   ├── scraper.py            # Job scraping (optional)
+│   └── main.py               # Index & View Profile
+├── templates/
+│   └── ... (all HTML files)
+└── static/

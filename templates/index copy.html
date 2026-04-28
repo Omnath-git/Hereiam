@@ -1,0 +1,922 @@
+{% extends "base.html" %}
+
+{% block title %}Professionals Data Bank - Jobs & Talent{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================================
+       INDEX PAGE STYLES
+       ============================================================ */
+    
+    .hero-banner {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+        border-radius: 20px;
+        padding: 36px 40px 28px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 50%;
+    }
+    
+    .hero-heading {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 6px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.7);
+        margin-bottom: 20px;
+    }
+    
+    .hero-stats {
+        display: flex;
+        gap: 30px;
+    }
+    
+    .hero-stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #8b5cf6;
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.6);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .hero-icon {
+        color: rgba(139, 92, 246, 0.15);
+        font-size: 6rem;
+    }
+    
+    /* ============================================================
+       MAIN TABS
+       ============================================================ */
+    .main-tabs {
+        border-bottom: 2px solid #e5e7eb;
+        gap: 0;
+        margin-bottom: 20px;
+    }
+    
+    .main-tabs .nav-link {
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        padding: 14px 28px;
+        border-radius: 12px 12px 0 0;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+        position: relative;
+    }
+    
+    .main-tabs .nav-link.active {
+        color: #8b5cf6;
+        background: white;
+        border-bottom: 3px solid #8b5cf6;
+    }
+    
+    .main-tabs .nav-link:hover:not(.active) {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    
+    .main-tabs .nav-link .badge {
+        margin-left: 6px;
+        font-size: 0.7rem;
+    }
+    
+    /* ============================================================
+       FILTER SECTION
+       ============================================================ */
+    .filter-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background: white;
+        margin-bottom: 20px;
+    }
+    
+    .filter-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-weight: 500;
+        font-size: 0.85rem;
+        color: #374151;
+        transition: all 0.3s;
+        cursor: pointer;
+        background: white;
+    }
+    
+    .filter-select:focus {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    
+    .btn-reset {
+        background: #f3f4f6;
+        color: #6b7280;
+        border: 2px solid #e5e7eb;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .btn-reset:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    
+    .active-filters {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #ede9fe;
+        color: #7c3aed;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+    }
+    
+    .filter-remove {
+        color: #7c3aed;
+        text-decoration: none;
+        font-size: 1.1rem;
+        line-height: 1;
+        opacity: 0.7;
+    }
+    
+    .filter-remove:hover {
+        opacity: 1;
+    }
+    
+    .results-info {
+        margin-bottom: 16px;
+    }
+    
+    /* ============================================================
+       UNIFIED CARD DESIGN (Same for Professionals & Jobs)
+       ============================================================ */
+    
+    .unified-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        cursor: pointer;
+    }
+    
+    .unified-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+        transform: translateY(-4px);
+        border-color: #c4b5fd;
+    }
+    
+    /* Card Header */
+    .unified-card-header {
+        padding: 18px 20px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        position: relative;
+    }
+    
+    .unified-card-header .card-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+        line-height: 1.3;
+        display: -webkit-box;
+        line-clamp: 2;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .card-subtitle {
+        color: #8b5cf6;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    /* Card Body */
+    .unified-card-body {
+        padding: 14px 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .card-meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-size: 0.78rem;
+        color: #64748b;
+    }
+    
+    .card-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #f8fafc;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+    
+    .card-meta-item i {
+        font-size: 0.7rem;
+        opacity: 0.7;
+    }
+    
+    .card-description {
+        font-size: 0.83rem;
+        color: #64748b;
+        line-height: 1.5;
+        display: -webkit-box;
+        line-clamp: 3;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin: 0;
+    }
+    
+    .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .card-tag {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 3px 9px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    .card-tag-more {
+        background: #ede9fe;
+        color: #7c3aed;
+        padding: 3px 9px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    /* Salary & Notice Badges */
+    .card-salary-notice {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .badge-salary {
+        background: #dcfce7;
+        color: #166534;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    
+    .badge-notice {
+        background: #fef3c7;
+        color: #92400e;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+    
+    /* Card Footer */
+    .unified-card-footer {
+        padding: 12px 20px;
+        border-top: 1px solid #f1f5f9;
+        background: #fafafa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .card-date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 6px;
+    }
+    
+    .btn-card-action {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-view {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+    }
+    
+    .btn-view:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+    
+    .btn-apply {
+        background: #10b981;
+        color: white;
+    }
+    
+    .btn-apply:hover {
+        background: #059669;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .btn-email {
+        background: white;
+        color: #8b5cf6;
+        border: 2px solid #8b5cf6;
+    }
+    
+    .btn-email:hover {
+        background: #8b5cf6;
+        color: white;
+    }
+    
+    /* Professional Avatar in Card */
+    .card-avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 4px;
+    }
+    
+    .card-avatar {
+        width: 78px;
+        height: 78px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+        flex-shrink: 0;
+    }
+    
+    .card-avatar-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .card-avatar-name {
+        font-weight: 700;
+        font-size: 1.3rem;
+        color: #010f25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .card-avatar-domain {
+        font-size: 1.28rem;
+        color: #0d012b;
+        font-weight: 600;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .empty-state-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    
+    .btn-empty {
+        padding: 10px 24px;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+    
+    .btn-empty-primary {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+    }
+    
+    .btn-empty-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        color: white;
+    }
+    
+    .btn-empty-outline {
+        border: 2px solid #8b5cf6;
+        color: #8b5cf6;
+        background: white;
+    }
+    
+    .btn-empty-outline:hover {
+        background: #8b5cf6;
+        color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-banner {
+            padding: 24px 20px 20px;
+        }
+        
+        .hero-heading {
+            font-size: 1.6rem;
+        }
+        
+        .hero-stats {
+            gap: 16px;
+        }
+        
+        .stat-number {
+            font-size: 1.3rem;
+        }
+        
+        .main-tabs .nav-link {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+        }
+        
+        .unified-card-header {
+            padding: 14px 16px 12px;
+        }
+        
+        .unified-card-body {
+            padding: 12px 16px;
+        }
+        
+        .unified-card-footer {
+            padding: 10px 16px;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .card-actions {
+            width: 100%;
+        }
+        
+        .btn-card-action {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2">
+<!-- Tab Navigation -->
+    <ul class="nav main-tabs" id="mainTabs">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'professionals' %}active{% endif %}" 
+               href="{{ url_for('main.index', tab='professionals', domain=current_domain, state=current_state, city=current_city, salary=current_salary, notice=current_notice) }}">
+                <i class="fas fa-users me-2"></i>Professionals
+                <span class="badge bg-primary">{{ professionals|length }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'jobs' %}active{% endif %}" 
+               href="{{ url_for('main.index', tab='jobs', domain=current_domain, state=current_state, city=current_city, salary=current_salary) }}">
+                <i class="fas fa-briefcase me-2"></i>Open Jobs
+                <span class="badge bg-success">{{ jobs|length }}</span>
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('main.index') }}" id="filterForm">
+                <input type="hidden" name="tab" value="{{ active_tab }}">
+                <div class="row g-2">
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <select name="domain" class="form-select filter-select" onchange="this.form.submit()">
+                            <option value="">📋 All Domains</option>
+                            {% for domain in domains %}
+                                {% if domain[0] %}
+                                <option value="{{ domain[0] }}" {% if current_domain == domain[0] %}selected{% endif %}>{{ domain[0] }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <select name="state" class="form-select filter-select" onchange="this.form.submit()">
+                            <option value="">🗺️ All States</option>
+                            {% for state in states %}
+                                {% if state[0] %}
+                                <option value="{{ state[0] }}" {% if current_state == state[0] %}selected{% endif %}>{{ state[0] }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <select name="city" class="form-select filter-select" onchange="this.form.submit()">
+                            <option value="">🏙️ All Cities</option>
+                            {% for city in cities %}
+                                {% if city[0] %}
+                                <option value="{{ city[0] }}" {% if current_city == city[0] %}selected{% endif %}>{{ city[0] }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <select name="salary" class="form-select filter-select" onchange="this.form.submit()">
+                            <option value="">💰 All Salary</option>
+                            {% for range in salary_ranges %}
+                                <option value="{{ range }}" {% if current_salary == range %}selected{% endif %}>{{ range }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% if active_tab == 'professionals' %}
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <select name="notice" class="form-select filter-select" onchange="this.form.submit()">
+                            <option value="">⏰ All Notice</option>
+                            {% for period in notice_periods %}
+                                <option value="{{ period }}" {% if current_notice == period %}selected{% endif %}>{{ period }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-lg-2 col-md-4 col-6">
+                        <button type="button" class="btn-reset" onclick="resetFilters()">
+                            <i class="fas fa-redo me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Active Filters -->
+            {% if current_domain or current_state or current_city or current_salary or current_notice %}
+            <div class="active-filters mt-3">
+                <small class="text-muted me-2">Active:</small>
+                {% if current_domain %}
+                <span class="filter-badge">{{ current_domain }} <a href="{{ url_for('main.index', tab=active_tab, state=current_state, city=current_city, salary=current_salary, notice=current_notice) }}" class="filter-remove">&times;</a></span>
+                {% endif %}
+                {% if current_state %}
+                <span class="filter-badge">{{ current_state }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, city=current_city, salary=current_salary, notice=current_notice) }}" class="filter-remove">&times;</a></span>
+                {% endif %}
+                {% if current_city %}
+                <span class="filter-badge">{{ current_city }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, salary=current_salary, notice=current_notice) }}" class="filter-remove">&times;</a></span>
+                {% endif %}
+                {% if current_salary %}
+                <span class="filter-badge">{{ current_salary }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, notice=current_notice) }}" class="filter-remove">&times;</a></span>
+                {% endif %}
+                {% if current_notice %}
+                <span class="filter-badge">{{ current_notice }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, salary=current_salary) }}" class="filter-remove">&times;</a></span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Results Info -->
+    <div class="results-info">
+        <small class="text-muted">
+            <i class="fas fa-search me-1"></i>
+            Found <strong>{{ professionals|length if active_tab == 'professionals' else jobs|length }}</strong> 
+            {{ 'professional(s)' if active_tab == 'professionals' else 'job(s)' }}
+        </small>
+    </div>
+    
+    <!-- ================================================================
+         PROFESSIONALS TAB CONTENT
+         ================================================================ -->
+    {% if active_tab == 'professionals' %}
+    <div class="row" id="professionalsGrid">
+        {% if professionals %}
+            {% for user in professionals %}
+            <div class="col-xl-4 col-lg-6 mb-4">
+                <div class="unified-card" 
+                     {% if user.profile_url %}
+                     onclick="window.open('{{ url_for('main.view_profile', filename=user.profile_url) }}', '_blank')"
+                     {% endif %}>
+                    
+                    <!-- Card Header -->
+                    <div class="unified-card-header">
+                        {% if not user.profile_url %}
+                        <div class="card-badge">
+                            <span class="badge bg-warning text-dark" style="font-size: 0.65rem;">Pending</span>
+                        </div>
+                        {% endif %}
+                        <div class="card-avatar-section">
+                            {% if user.profile_photo %}
+                            <img src="{{ url_for('static', filename=user.profile_photo) }}" 
+                                 alt="{{ user.full_name }}" 
+                                 class="card-avatar"
+                                 loading="lazy"
+                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
+                                 alt="Avatar" 
+                                 class="card-avatar"
+                                 loading="lazy">
+                            {% endif %}
+                            <div class="card-avatar-info">
+                                <div class="card-avatar-name">{{ user.full_name }}</div>
+                                <div class="card-avatar-domain">{{ user.domain }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="unified-card-body">
+                        <!-- Meta Info -->
+                        <div class="card-meta-row">
+                            <span class="card-meta-item">
+                                <i class="fas fa-clock"></i> {{ user.experience_years or 'Fresher' }}
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-map-marker-alt"></i> {{ user.city }}
+                            </span>
+                        </div>
+                        
+                        <!-- Salary & Notice Period -->
+                        {% if user.expected_salary or user.notice_period %}
+                        <div class="card-salary-notice">
+                            {% if user.expected_salary %}
+                            <span class="badge-salary">
+                                <i class="fas fa-rupee-sign"></i> {{ user.expected_salary }}
+                            </span>
+                            {% endif %}
+                            {% if user.notice_period %}
+                            <span class="badge-notice">
+                                <i class="fas fa-calendar-alt"></i> {{ user.notice_period }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Description/Summary -->
+                        {% if user.summary %}
+                        <p class="card-description">{{ user.summary[:150] }}{% if user.summary|length > 150 %}...{% endif %}</p>
+                        {% endif %}
+                        
+                        <!-- Skills Tags -->
+                        {% if user.skills and user.skills != '[]' %}
+                        <div class="card-tags">
+                            {% set skill_list = user.skills|replace('[','')|replace(']','')|replace('"','') %}
+                            {% for skill in skill_list.split(',')[:4] %}
+                                {% if skill.strip() %}
+                                <span class="card-tag">{{ skill.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if skill_list.split(',')|length > 4 %}
+                            <span class="card-tag-more">+{{ skill_list.split(',')|length - 4 }} more</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Card Footer -->
+                    <div class="unified-card-footer">
+                        <span class="card-date">
+                            <i class="far fa-calendar-alt"></i> 
+                            {{ user.created_at.strftime('%d %b, %Y') if user.created_at else 'Recent' }}
+                        </span>
+                        <div class="card-actions">
+                            {% if user.profile_url %}
+                            <button class="btn-card-action btn-view" 
+                                    onclick="event.stopPropagation(); window.open('{{ url_for('main.view_profile', filename=user.profile_url) }}', '_blank')">
+                                <i class="fas fa-eye"></i> View Profile
+                            </button>
+                            {% else %}
+                            <button class="btn-card-action btn-email" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                <i class="fas fa-hourglass-half"></i> Coming Soon
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-user-slash"></i>
+                    </div>
+                    <h4>No Professionals Found</h4>
+                    <p>Try adjusting your filters or check back later</p>
+                    <div class="empty-state-actions">
+                        <a href="{{ url_for('main.index', tab='professionals') }}" class="btn-empty btn-empty-outline">
+                            <i class="fas fa-redo me-2"></i>Clear Filters
+                        </a>
+                        <a href="{{ url_for('auth.register') }}" class="btn-empty btn-empty-primary">
+                            <i class="fas fa-user-plus me-2"></i>Join as Professional
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- ================================================================
+         JOBS TAB CONTENT
+         ================================================================ -->
+    {% else %}
+    <div class="row" id="jobsGrid">
+        {% if jobs %}
+            {% for job in jobs %}
+            <div class="col-xl-4 col-lg-6 mb-4">
+                <div class="unified-card">
+                    
+                    <!-- Card Header -->
+                    <div class="unified-card-header">
+                        {% if job.source == 'scraped' %}
+                        <div class="card-badge">
+                            <span class="badge bg-info" style="font-size: 0.65rem;">Verified</span>
+                        </div>
+                        {% endif %}
+                        <h5 class="card-title">{{ job.title }}</h5>
+                        <p class="card-subtitle">
+                            <i class="fas fa-building"></i> {{ job.company }}
+                        </p>
+                    </div>
+                    
+                    <!-- Card Body -->
+                    <div class="unified-card-body">
+                        <!-- Meta Info -->
+                        <div class="card-meta-row">
+                            <span class="card-meta-item">
+                                <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-rupee-sign"></i> {{ job.salary_range or 'Not Disclosed' }}
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-briefcase"></i> {{ job.experience_required or 'Any' }}
+                            </span>
+                            <span class="card-meta-item">
+                                <i class="fas fa-clock"></i> {{ job.job_type }}
+                            </span>
+                        </div>
+                        
+                        <!-- Description -->
+                        <p class="card-description">{{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}</p>
+                        
+                        <!-- Skills Tags -->
+                        {% if job.skills_required %}
+                        <div class="card-tags">
+                            {% for skill in job.skills_required.split(',')[:5] %}
+                                {% if skill.strip() %}
+                                <span class="card-tag">{{ skill.strip() }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Card Footer -->
+                    <div class="unified-card-footer">
+                        <span class="card-date">
+                            <i class="far fa-calendar-alt"></i> 
+                            {{ job.posted_date.strftime('%d %b, %Y') if job.posted_date else 'Recent' }}
+                        </span>
+                        <div class="card-actions">
+                            {% if job.apply_method == 'website' or job.apply_method == 'both' %}
+                                {% if job.apply_website %}
+                                <a href="{{ job.apply_website }}" target="_blank" class="btn-card-action btn-apply">
+                                    <i class="fas fa-external-link-alt"></i> Apply Now
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                            {% if job.apply_method == 'email' or job.apply_method == 'both' %}
+                                {% if job.apply_email %}
+                                <a href="mailto:{{ job.apply_email }}" class="btn-card-action btn-email">
+                                    <i class="fas fa-envelope"></i> Email
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h4>No Jobs Found</h4>
+                    <p>Check back later or adjust your filters</p>
+                    <div class="empty-state-actions">
+                        <a href="{{ url_for('main.index', tab='jobs') }}" class="btn-empty btn-empty-outline">
+                            <i class="fas fa-redo me-2"></i>Clear Filters
+                        </a>
+                        {% if session.user_type == 'employer' %}
+                        <a href="{{ url_for('jobs.post_job') }}" class="btn-empty btn-empty-primary">
+                            <i class="fas fa-plus-circle me-2"></i>Post a Job
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function resetFilters() {
+        window.location.href = "{{ url_for('main.index', tab=active_tab) }}";
+    }
+</script>
+{% endblock %}

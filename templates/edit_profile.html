@@ -1,0 +1,792 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - Professionals Data Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2">
+            <div class="card mb-3">
+                <div class="card-body text-center p-3">
+                    <div class="mb-3" id="photoPreviewContainer">
+                        {% if user.profile_photo %}
+                            <img src="{{ url_for('static', filename=user.profile_photo) }}" 
+                                 alt="{{ user.full_name }}" 
+                                 class="edit-avatar" id="profilePhotoPreview"
+                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
+                                 alt="Default Avatar" 
+                                 class="edit-avatar" id="profilePhotoPreview">
+                        {% endif %}
+                    </div>
+                    <h6 class="fw-bold">{{ user.full_name }}</h6>
+                    <span class="badge bg-success">Editing</span>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-body p-0">
+                    <nav class="nav flex-column" id="sectionNav">
+                        <a class="nav-link active" href="#basicInfoSection" data-section="basicInfoSection" style="background: #cebfb6;">
+                            <i class="fas fa-user me-2"></i>Basic Info
+                        </a>
+                        <a class="nav-link" href="#skillsSection" data-section="skillsSection" style="background: #866a57;">
+                            <i class="fas fa-cogs me-2"></i>Skills
+                        </a>
+                        <a class="nav-link" href="#experienceSection" data-section="experienceSection" style="background: #588b78;">
+                            <i class="fas fa-briefcase me-2"></i>Experience
+                        </a>
+                        <a class="nav-link" href="#educationSection" data-section="educationSection" style="background: #eeb28a;">
+                            <i class="fas fa-graduation-cap me-2"></i>Education
+                        </a>
+                        <a class="nav-link" href="#projectsSection" data-section="projectsSection" style="background: #7478a8;">
+                            <i class="fas fa-project-diagram me-2"></i>Projects
+                        </a>
+                        <a class="nav-link" href="#certificationsSection" data-section="certificationsSection" style="background: #616661;">
+                            <i class="fas fa-certificate me-2"></i>Certifications
+                        </a>
+                        <a class="nav-link" href="#languagesSection" data-section="languagesSection" style="background: #93b8ce;">
+                            <i class="fas fa-language me-2"></i>Languages
+                        </a>
+                        <a class="nav-link" href="#achievementsSection" data-section="achievementsSection" style="background: #975c6f;">
+                            <i class="fas fa-trophy me-2"></i>Achievements
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+            <!-- CV Re-upload Banner -->
+            <div class="cv-upload-banner mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold text-white mb-1">
+                            <i class="fas fa-file-pdf me-2"></i>Update from CV
+                        </h5>
+                        <p class="text-white-50 mb-0">Upload a new CV to auto-fill all sections</p>
+                    </div>
+                    <div>
+                        <input type="file" id="cvReupload" accept=".pdf" style="display: none;">
+                        <button class="btn btn-light" onclick="document.getElementById('cvReupload').click()">
+                            <i class="fas fa-upload me-2"></i>Upload New CV
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Basic Info Section -->
+            <div class="section-card" id="basicInfoSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-user me-2"></i>Basic Information</h5>
+                    <button class="btn btn-save" onclick="saveSection('basic_info')">
+                        <i class="fas fa-save me-2"></i>Save Basic Info
+                    </button>
+                </div>
+                <div class="section-body">
+                    <form id="basicInfoForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Profile Photo</label>
+                                <input type="file" name="profile_photo" class="form-control" accept="image/*" onchange="previewPhoto(event)">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Full Name *</label>
+                                <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Domain *</label>
+                                <input type="text" name="domain" class="form-control" value="{{ user.domain }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Experience</label>
+                                <select name="experience_years" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="Fresher" {% if user.experience_years == 'Fresher' %}selected{% endif %}>Fresher</option>
+                                    <option value="1+ year" {% if user.experience_years == '1+ year' %}selected{% endif %}>1+ year</option>
+                                    <option value="3+ years" {% if user.experience_years == '3+ years' %}selected{% endif %}>3+ years</option>
+                                    <option value="5+ years" {% if user.experience_years == '5+ years' %}selected{% endif %}>5+ years</option>
+                                    <option value="10+ years" {% if user.experience_years == '10+ years' %}selected{% endif %}>10+ years</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">City</label>
+                                <input type="text" name="city" class="form-control" value="{{ user.city }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">State</label>
+                                <input type="text" name="state" class="form-control" value="{{ user.state }}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Professional Summary</label>
+                            <textarea name="summary" class="form-control" rows="4">{{ user.summary or '' }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">LinkedIn</label>
+                                <input type="url" name="linkedin" class="form-control" value="{{ user.linkedin or '' }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">GitHub</label>
+                                <input type="url" name="github" class="form-control" value="{{ user.github or '' }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Portfolio</label>
+                                <input type="url" name="portfolio" class="form-control" value="{{ user.portfolio or '' }}">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="section-card" id="jobPreferencesSection">
+    <div class="section-header">
+        <h5><i class="fas fa-sliders-h me-2"></i>Job Preferences</h5>
+        <button class="btn btn-save" onclick="saveSection('job_preferences')">
+            <i class="fas fa-save me-2"></i>Save Preferences
+        </button>
+    </div>
+    <div class="section-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-rupee-sign me-2" style="color: #10b981;"></i>Expected Salary
+                </label>
+                <select name="expected_salary" class="form-select" id="expectedSalary">
+                    <option value="">Select Salary Range</option>
+                    <option value="0-3 LPA" {% if user.expected_salary == '0-3 LPA' %}selected{% endif %}>0-3 LPA</option>
+                    <option value="3-6 LPA" {% if user.expected_salary == '3-6 LPA' %}selected{% endif %}>3-6 LPA</option>
+                    <option value="6-10 LPA" {% if user.expected_salary == '6-10 LPA' %}selected{% endif %}>6-10 LPA</option>
+                    <option value="10-15 LPA" {% if user.expected_salary == '10-15 LPA' %}selected{% endif %}>10-15 LPA</option>
+                    <option value="15-25 LPA" {% if user.expected_salary == '15-25 LPA' %}selected{% endif %}>15-25 LPA</option>
+                    <option value="25-50 LPA" {% if user.expected_salary == '25-50 LPA' %}selected{% endif %}>25-50 LPA</option>
+                    <option value="50+ LPA" {% if user.expected_salary == '50+ LPA' %}selected{% endif %}>50+ LPA</option>
+                    <option value="Negotiable" {% if user.expected_salary == 'Negotiable' %}selected{% endif %}>Negotiable</option>
+                </select>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold">
+                    <i class="fas fa-calendar-alt me-2" style="color: #f59e0b;"></i>Notice Period
+                </label>
+                <select name="notice_period" class="form-select" id="noticePeriod">
+                    <option value="">Select Notice Period</option>
+                    <option value="Immediate" {% if user.notice_period == 'Immediate' %}selected{% endif %}>Immediate Joining</option>
+                    <option value="15 Days" {% if user.notice_period == '15 Days' %}selected{% endif %}>15 Days</option>
+                    <option value="30 Days" {% if user.notice_period == '30 Days' %}selected{% endif %}>30 Days</option>
+                    <option value="60 Days" {% if user.notice_period == '60 Days' %}selected{% endif %}>60 Days</option>
+                    <option value="90 Days" {% if user.notice_period == '90 Days' %}selected{% endif %}>90 Days</option>
+                    <option value="90+ Days" {% if user.notice_period == '90+ Days' %}selected{% endif %}>90+ Days</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Skills Section -->
+            <div class="section-card" id="skillsSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-cogs me-2"></i>Skills & Expertise</h5>
+                    <button class="btn btn-save" onclick="saveSection('skills')">
+                        <i class="fas fa-save me-2"></i>Save Skills
+                    </button>
+                </div>
+                <div class="section-body">
+                    <textarea name="skills" class="form-control" rows="3" placeholder="Python, JavaScript, React, Node.js, SQL...">{{ skills }}</textarea>
+                    <small class="text-muted">Enter skills separated by commas</small>
+                    <div class="skills-preview mt-2" id="skillsPreview"></div>
+                </div>
+            </div>
+            
+            <!-- Experience Section -->
+            <div class="section-card" id="experienceSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-briefcase me-2"></i>Work Experience</h5>
+                    <div>
+                        <button class="btn btn-outline btn-sm me-2" onclick="addExperience()">
+                            <i class="fas fa-plus me-1"></i>Add
+                        </button>
+                        <button class="btn btn-save" onclick="saveSection('experience')">
+                            <i class="fas fa-save me-2"></i>Save Experience
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body" id="experienceContainer">
+                    <div class="text-center text-muted py-3" id="noExperience">
+                        <i class="fas fa-briefcase fa-2x mb-2"></i>
+                        <p>No experience added yet</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Education Section -->
+            <div class="section-card" id="educationSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                    <div>
+                        <button class="btn btn-outline btn-sm me-2" onclick="addEducation()">
+                            <i class="fas fa-plus me-1"></i>Add
+                        </button>
+                        <button class="btn btn-save" onclick="saveSection('education')">
+                            <i class="fas fa-save me-2"></i>Save Education
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body" id="educationContainer">
+                    <div class="text-center text-muted py-3" id="noEducation">
+                        <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                        <p>No education added yet</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Projects Section -->
+            <div class="section-card" id="projectsSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-project-diagram me-2"></i>Projects</h5>
+                    <div>
+                        <button class="btn btn-outline btn-sm me-2" onclick="addProject()">
+                            <i class="fas fa-plus me-1"></i>Add
+                        </button>
+                        <button class="btn btn-save" onclick="saveSection('projects')">
+                            <i class="fas fa-save me-2"></i>Save Projects
+                        </button>
+                    </div>
+                </div>
+                <div class="section-body" id="projectsContainer">
+                    <div class="text-center text-muted py-3" id="noProjects">
+                        <i class="fas fa-project-diagram fa-2x mb-2"></i>
+                        <p>No projects added yet</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Certifications Section -->
+            <div class="section-card" id="certificationsSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-certificate me-2"></i>Certifications</h5>
+                    <button class="btn btn-save" onclick="saveSection('certifications')">
+                        <i class="fas fa-save me-2"></i>Save Certifications
+                    </button>
+                </div>
+                <div class="section-body">
+                    <textarea name="certifications" class="form-control" rows="4" placeholder="Enter each certification on a new line">{{ certifications }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Languages Section -->
+            <div class="section-card" id="languagesSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-language me-2"></i>Languages</h5>
+                    <button class="btn btn-save" onclick="saveSection('languages')">
+                        <i class="fas fa-save me-2"></i>Save Languages
+                    </button>
+                </div>
+                <div class="section-body">
+                    <textarea name="languages" class="form-control" rows="2" placeholder="English, Hindi, Spanish...">{{ languages }}</textarea>
+                    <small class="text-muted">Enter languages separated by commas</small>
+                </div>
+            </div>
+            
+            <!-- Achievements Section -->
+            <div class="section-card" id="achievementsSection">
+                <div class="section-header">
+                    <h5><i class="fas fa-trophy me-2"></i>Achievements</h5>
+                    <button class="btn btn-save" onclick="saveSection('achievements')">
+                        <i class="fas fa-save me-2"></i>Save Achievements
+                    </button>
+                </div>
+                <div class="section-body">
+                    <textarea name="achievements" class="form-control" rows="4" placeholder="Enter each achievement on a new line">{{ achievements }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Regenerate Profile Button -->
+            <div class="section-card regenerate-card">
+                <div class="section-body text-center">
+                    <h5 class="mb-3"><i class="fas fa-sync me-2"></i>Regenerate Profile Page</h5>
+                    <p class="text-muted mb-3">After making all changes, regenerate your public profile page</p>
+                    <button class="btn btn-regenerate" onclick="regenerateProfile()">
+                        <i class="fas fa-magic me-2"></i>Generate New Profile Page
+                    </button>
+                    <button class="btn btn-outline ms-2" onclick="window.open('{{ url_for('main.view_profile', filename=user.profile_url) if user.profile_url else '#' }}', '_blank')">
+                        <i class="fas fa-eye me-2"></i>View Current Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="saveToast" class="toast" role="alert">
+        <div class="toast-body" id="toastMessage"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Toast function
+function showToast(message, success = true) {
+    const toast = document.getElementById('saveToast');
+    const toastMsg = document.getElementById('toastMessage');
+    toastMsg.textContent = message;
+    toast.style.background = success ? '#10b981' : '#ef4444';
+    toast.style.color = 'white';
+    toast.style.borderRadius = '10px';
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+// Save section via AJAX
+function saveSection(section) {
+    const formData = new FormData();
+    formData.append('section', section);
+        if (section === 'job_preferences') {
+        formData.append('expected_salary', document.getElementById('expectedSalary').value);
+        formData.append('notice_period', document.getElementById('noticePeriod').value);
+        
+        fetch('/update-job-preferences', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            showToast(data.message, data.success);
+        });
+        return;
+    }
+    if (section === 'basic_info') {
+        const form = document.getElementById('basicInfoForm');
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.type === 'file') {
+                if (input.files[0]) {
+                    formData.append(input.name, input.files[0]);
+                }
+            } else {
+                formData.append(input.name, input.value);
+            }
+        });
+        // Also add profile photo if selected
+        const photoInput = document.querySelector('#basicInfoForm input[type="file"]');
+        if (photoInput && photoInput.files[0]) {
+            formData.append('profile_photo', photoInput.files[0]);
+        }
+    } else if (section === 'skills') {
+        formData.append('skills', document.querySelector('#skillsSection textarea').value);
+    } else if (section === 'experience') {
+        const expCards = document.querySelectorAll('#experienceContainer .exp-card');
+        expCards.forEach((card, index) => {
+            const title = card.querySelector('[name="exp_title"]')?.value || '';
+            const company = card.querySelector('[name="exp_company"]')?.value || '';
+            const duration = card.querySelector('[name="exp_duration"]')?.value || '';
+            const description = card.querySelector('[name="exp_description"]')?.value || '';
+            if (title) {
+                formData.append(`exp_title_${index}`, title);
+                formData.append(`exp_company_${index}`, company);
+                formData.append(`exp_duration_${index}`, duration);
+                formData.append(`exp_description_${index}`, description);
+            }
+        });
+    } else if (section === 'education') {
+        const eduCards = document.querySelectorAll('#educationContainer .exp-card');
+        eduCards.forEach((card, index) => {
+            const degree = card.querySelector('[name="edu_degree"]')?.value || '';
+            const institution = card.querySelector('[name="edu_institution"]')?.value || '';
+            const year = card.querySelector('[name="edu_year"]')?.value || '';
+            if (degree) {
+                formData.append(`edu_degree_${index}`, degree);
+                formData.append(`edu_institution_${index}`, institution);
+                formData.append(`edu_year_${index}`, year);
+            }
+        });
+    } else if (section === 'projects') {
+        const projCards = document.querySelectorAll('#projectsContainer .exp-card');
+        projCards.forEach((card, index) => {
+            const name = card.querySelector('[name="proj_name"]')?.value || '';
+            const description = card.querySelector('[name="proj_description"]')?.value || '';
+            const technologies = card.querySelector('[name="proj_technologies"]')?.value || '';
+            if (name) {
+                formData.append(`proj_name_${index}`, name);
+                formData.append(`proj_description_${index}`, description);
+                formData.append(`proj_technologies_${index}`, technologies);
+            }
+        });
+    } else {
+        // certifications, languages, achievements
+        const textarea = document.querySelector(`#${section}Section textarea`);
+        if (textarea) {
+            formData.append(section, textarea.value);
+        }
+    }
+    
+    fetch('/update-section', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast(data.message, data.success);
+    })
+    .catch(error => {
+        showToast('Error saving! Please try again.', false);
+    });
+}
+
+// Regenerate profile
+function regenerateProfile() {
+    const btn = document.querySelector('.btn-regenerate');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+    
+    fetch('/regenerate-profile', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Profile page regenerated successfully! 🎉', true);
+                // Update view profile button
+                document.querySelector('.btn-outline').href = data.profile_url;
+            } else {
+                showToast(data.message, false);
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic me-2"></i>Generate New Profile Page';
+        })
+        .catch(error => {
+            showToast('Error generating profile!', false);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic me-2"></i>Generate New Profile Page';
+        });
+}
+
+// CV Re-upload
+document.getElementById('cvReupload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('cv_file', file);
+    
+    const btn = document.querySelector('.btn-light');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+    
+    fetch('/reupload-cv', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('CV processed! All sections updated. 🎉', true);
+            // Reload page to show updated data
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showToast(data.message, false);
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload New CV';
+    })
+    .catch(error => {
+        showToast('Error processing CV!', false);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload New CV';
+    });
+});
+
+// Preview photo
+function previewPhoto(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById('profilePhotoPreview').src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+// Add Experience
+function addExperience() {
+    document.getElementById('noExperience').style.display = 'none';
+    const container = document.getElementById('experienceContainer');
+    const div = document.createElement('div');
+    div.className = 'exp-card';
+    div.innerHTML = `
+        <button class="btn-remove" onclick="this.parentElement.remove(); checkEmpty('experience')"><i class="fas fa-times"></i></button>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label small fw-bold">Job Title</label>
+                <input type="text" name="exp_title" class="form-control form-control-sm" placeholder="Software Engineer">
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label small fw-bold">Company</label>
+                <input type="text" name="exp_company" class="form-control form-control-sm" placeholder="Google">
+            </div>
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Duration</label>
+            <input type="text" name="exp_duration" class="form-control form-control-sm" placeholder="2020 - 2023">
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Description</label>
+            <textarea name="exp_description" class="form-control form-control-sm" rows="2"></textarea>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+// Add Education
+function addEducation() {
+    document.getElementById('noEducation').style.display = 'none';
+    const container = document.getElementById('educationContainer');
+    const div = document.createElement('div');
+    div.className = 'exp-card';
+    div.innerHTML = `
+        <button class="btn-remove" onclick="this.parentElement.remove(); checkEmpty('education')"><i class="fas fa-times"></i></button>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Degree</label>
+            <input type="text" name="edu_degree" class="form-control form-control-sm" placeholder="B.Tech in Computer Science">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label small fw-bold">Institution</label>
+                <input type="text" name="edu_institution" class="form-control form-control-sm" placeholder="IIT Delhi">
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label small fw-bold">Year</label>
+                <input type="text" name="edu_year" class="form-control form-control-sm" placeholder="2020">
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+// Add Project
+function addProject() {
+    document.getElementById('noProjects').style.display = 'none';
+    const container = document.getElementById('projectsContainer');
+    const div = document.createElement('div');
+    div.className = 'exp-card';
+    div.innerHTML = `
+        <button class="btn-remove" onclick="this.parentElement.remove(); checkEmpty('projects')"><i class="fas fa-times"></i></button>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Project Name</label>
+            <input type="text" name="proj_name" class="form-control form-control-sm" placeholder="E-commerce Platform">
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Description</label>
+            <textarea name="proj_description" class="form-control form-control-sm" rows="2"></textarea>
+        </div>
+        <div class="mb-2">
+            <label class="form-label small fw-bold">Technologies</label>
+            <input type="text" name="proj_technologies" class="form-control form-control-sm" placeholder="React, Node.js, MongoDB">
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function checkEmpty(type) {
+    const containerMap = {
+        'experience': { container: 'experienceContainer', noData: 'noExperience' },
+        'education': { container: 'educationContainer', noData: 'noEducation' },
+        'projects': { container: 'projectsContainer', noData: 'noProjects' }
+    };
+    const map = containerMap[type];
+    if (map) {
+        const items = document.getElementById(map.container).querySelectorAll('.exp-card');
+        if (items.length === 0) {
+            document.getElementById(map.noData).style.display = 'block';
+        }
+    }
+}
+
+// Skills preview
+document.querySelector('#skillsSection textarea')?.addEventListener('input', function() {
+    const skills = this.value.split(',').filter(s => s.trim());
+    const preview = document.getElementById('skillsPreview');
+    preview.innerHTML = skills.map(s => `<span class="skill-tag">${s.trim()}</span>`).join('');
+});
+
+// Sidebar navigation
+document.querySelectorAll('#sectionNav a').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('#sectionNav a').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        const target = document.getElementById(this.dataset.section);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+</script>
+
+<style>
+:root {
+    --purple: #8b5cf6;
+    --green: #10b981;
+    --dark: #1e293b;
+}
+
+.edit-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #8b5cf6;
+    object-fit: cover;
+}
+
+.cv-upload-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 20px 24px;
+}
+
+.section-card {
+    background: white;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    background: #fafafa;
+    border-radius: 16px 16px 0 0;
+}
+
+.section-header h5 {
+    margin: 0;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.section-body {
+    padding: 20px;
+}
+
+.btn-save {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+.btn-save:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    border: 2px solid #8b5cf6;
+    color: #8b5cf6;
+    background: transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+.btn-outline:hover {
+    background: #8b5cf6;
+    color: white;
+}
+
+.btn-regenerate {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: all 0.3s;
+}
+.btn-regenerate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.exp-card {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+    border-left: 4px solid #8b5cf6;
+    animation: slideIn 0.3s ease;
+}
+
+.btn-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+}
+
+.regenerate-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid #10b981;
+}
+
+.skill-tag {
+    display: inline-block;
+    background: #ede9fe;
+    color: #7c3aed;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin: 3px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.nav-link {
+    padding: 10px 16px;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+}
+.nav-link:hover, .nav-link.active {
+    background: #f5f3ff;
+    color: #7c3aed;
+    border-left-color: #7c3aed;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .section-header { flex-direction: column; gap: 10px; }
+}
+</style>
+{% endblock %}
