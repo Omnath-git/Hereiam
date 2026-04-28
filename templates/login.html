@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Here I am{% endblock %}
+{% block title %}Login - Professionals Data Bank{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -65,16 +65,20 @@
                             <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
                             <label class="form-check-label" for="rememberMe">Remember me</label>
                         </div>
-                        
+                        <div class="mb-3 text-end">
+    <a href="{{ url_for('auth.forgot_password') }}" class="text-muted small">
+        <i class="fas fa-question-circle me-1"></i>Forgot Password?
+    </a>
+</div>
                         <button type="submit" class="btn btn-primary w-100 mb-3">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </button>
                         
-                        <div class="text-center mb-3">
+                        <!-- <div class="text-center mb-3">
                             <a href="#" class="text-muted small" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
                                 <i class="fas fa-question-circle me-1"></i>Forgot Password?
                             </a>
-                        </div>
+                        </div> -->
                         
                         <hr>
                         
