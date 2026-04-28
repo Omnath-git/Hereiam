@@ -682,7 +682,7 @@
             <div class="col-xl-4 col-lg-6 mb-4">
                 <div class="unified-card" 
                      {% if user.profile_url %}
-                     onclick="window.open('{{ url_for('main.view_profile', filename=user.profile_url) }}', '_blank')"
+                     data-action="view-profile" data-url="{{ url_for('main.view_profile', filename=user.profile_url) }}"
                      {% endif %}>
                     
                     <!-- Card Header -->
@@ -698,7 +698,8 @@
                                  alt="{{ user.full_name }}" 
                                  class="card-avatar"
                                  loading="lazy"
-                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                                 data-fallback="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}"
+                                 onerror="this.src=this.getAttribute('data-fallback')">
                             {% else %}
                             <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
                                  alt="Avatar" 
@@ -770,7 +771,8 @@
                         <div class="card-actions">
                             {% if user.profile_url %}
                             <button class="btn-card-action btn-view" 
-                                    onclick="event.stopPropagation(); window.open('{{ url_for('main.view_profile', filename=user.profile_url) }}', '_blank')">
+                                    data-action="view-profile-card"
+                                    data-url="{{ url_for('main.view_profile', filename=user.profile_url) }}">
                                 <i class="fas fa-eye"></i> View Profile
                             </button>
                             {% else %}
@@ -918,5 +920,27 @@
     function resetFilters() {
         window.location.href = "{{ url_for('main.index', tab=active_tab) }}";
     }
+    
+    // Handle view profile cards
+    document.querySelectorAll('[data-action="view-profile"]').forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            if (url) {
+                window.open(url, '_blank');
+            }
+        });
+    });
+    
+    // Handle view profile buttons
+    document.querySelectorAll('[data-action="view-profile-card"]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const url = this.getAttribute('data-url');
+            if (url) {
+                window.open(url, '_blank');
+            }
+        });
+    });
 </script>
 {% endblock %}

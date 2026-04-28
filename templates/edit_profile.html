@@ -14,7 +14,8 @@
                             <img src="{{ url_for('static', filename=user.profile_photo) }}" 
                                  alt="{{ user.full_name }}" 
                                  class="edit-avatar" id="profilePhotoPreview"
-                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                                 data-fallback="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}"
+                                 onerror="this.src=this.getAttribute('data-fallback')">
                         {% else %}
                             <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
                                  alt="Default Avatar" 
@@ -315,7 +316,7 @@
                     <button class="btn btn-regenerate" onclick="regenerateProfile()">
                         <i class="fas fa-magic me-2"></i>Generate New Profile Page
                     </button>
-                    <button class="btn btn-outline ms-2" onclick="window.open('{{ url_for('main.view_profile', filename=user.profile_url) if user.profile_url else '#' }}', '_blank')">
+                    <button class="btn btn-outline ms-2" data-action="view-profile" data-url="{{ url_for('main.view_profile', filename=user.profile_url) if user.profile_url else '#' }}">
                         <i class="fas fa-eye me-2"></i>View Current Profile
                     </button>
                 </div>
@@ -627,6 +628,14 @@ document.querySelectorAll('#sectionNav a').forEach(link => {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
+});
+
+// View profile button
+document.querySelector('[data-action="view-profile"]')?.addEventListener('click', function() {
+    const url = this.getAttribute('data-url');
+    if (url && url !== '#') {
+        window.open(url, '_blank');
+    }
 });
 </script>
 

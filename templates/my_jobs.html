@@ -338,13 +338,18 @@
                         <i class="fas fa-edit"></i> Edit
                     </a>
                     
-                    <button class="btn-action btn-toggle {{ 'inactive' if not job.is_active }}" 
-                            onclick="toggleJob({{ job.id }}, this)" title="{{ 'Deactivate' if job.is_active else 'Activate' }} Job">
+                    <button class="btn-action btn-toggle {{ 'inactive' if not job.is_active else '' }}" 
+                            data-job-id="{{ job.id }}" 
+                            data-action="toggle"
+                            title="{{ 'Deactivate' if job.is_active else 'Activate' }} Job">
                         <i class="fas fa-{{ 'pause' if job.is_active else 'play' }}"></i>
                         {{ 'Deactivate' if job.is_active else 'Activate' }}
                     </button>
                     
-                    <button class="btn-action btn-delete" onclick="deleteJob({{ job.id }})" title="Delete Job">
+                    <button class="btn-action btn-delete" 
+                            data-job-id="{{ job.id }}" 
+                            data-action="delete"
+                            title="Delete Job">
                         <i class="fas fa-trash-alt"></i> Delete
                     </button>
                 </div>
@@ -462,6 +467,25 @@
             alert('Network error. Please try again.');
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete Job';
+        });
+    });
+    
+    // Attach event listeners for data-action buttons
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle buttons
+        document.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const jobId = this.getAttribute('data-job-id');
+                toggleJob(jobId, this);
+            });
+        });
+        
+        // Delete buttons
+        document.querySelectorAll('[data-action="delete"]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const jobId = this.getAttribute('data-job-id');
+                deleteJob(jobId);
+            });
         });
     });
 </script>

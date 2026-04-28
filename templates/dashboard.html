@@ -14,7 +14,8 @@
                             <img src="{{ url_for('static', filename=current_user.profile_photo) }}" 
                                  alt="{{ current_user.full_name }}" 
                                  class="dashboard-avatar"
-                                 onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                                 data-fallback="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}"
+                                 onerror="this.src=this.getAttribute('data-fallback')">
                         {% else %}
                             <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
                                  alt="Default Avatar" 
@@ -451,7 +452,11 @@
                                             {% endif %}
                                         </div>
                                         <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
-                                            <div class="progress-bar" style="width: {{ '100' if user.profile_complete else '0' }}%; background: {{ '#10b981' if user.profile_complete else '#ef4444' }}; border-radius: 10px;"></div>
+                                            {% if user.profile_complete %}
+                                            <div class="progress-bar" style="width: 100%; background: #10b981; border-radius: 10px;"></div>
+                                            {% else %}
+                                            <div class="progress-bar" style="width: 0%; background: #ef4444; border-radius: 10px;"></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     
@@ -467,7 +472,11 @@
                                             {% endif %}
                                         </div>
                                         <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
-                                            <div class="progress-bar" style="width: {{ '100' if (user.skills and user.skills != '[]') else '0' }}%; background: {{ '#10b981' if (user.skills and user.skills != '[]') else '#ef4444' }}; border-radius: 10px;"></div>
+                                            {% if (user.skills and user.skills != '[]') %}
+                                            <div class="progress-bar" style="width: 100%; background: #10b981; border-radius: 10px;"></div>
+                                            {% else %}
+                                            <div class="progress-bar" style="width: 0%; background: #ef4444; border-radius: 10px;"></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     
@@ -483,7 +492,11 @@
                                             {% endif %}
                                         </div>
                                         <div class="progress" style="height: 6px; background: #e5e7eb; border-radius: 10px;">
-                                            <div class="progress-bar" style="width: {{ '100' if (user.experience and user.experience != '[]') else '0' }}%; background: {{ '#10b981' if (user.experience and user.experience != '[]') else '#ef4444' }}; border-radius: 10px;"></div>
+                                            {% if (user.experience and user.experience != '[]') %}
+                                            <div class="progress-bar" style="width: 100%; background: #10b981; border-radius: 10px;"></div>
+                                            {% else %}
+                                            <div class="progress-bar" style="width: 0%; background: #ef4444; border-radius: 10px;"></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
