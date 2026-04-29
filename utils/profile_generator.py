@@ -986,13 +986,13 @@ def build_all_sections(user, skills, education, experience, projects, certificat
         for skill in rest_skills:
             skills_html += f'<span class="skill-item">{skill}</span>'
         
-        html += f'''
+html += f'''
         <section class="section-card" id="skills">
             <h2 class="section-title"><i class="fas fa-cogs"></i> Skills & Expertise</h2>
             <div class="skills-container">{skills_html}</div>
-            <div style="margin-top:16px;display:flex;gap:16px;font-size:0.75rem;color:var(--secondary);">
-                <span><span class="skill-item skill-level-expert" style="font-size:0.7rem;padding:4px 10px;"><i class="fas fa-star"></i></span> Expert</span>
-                <span><span class="skill-item skill-level-advanced" style="font-size:0.7rem;padding:4px 10px;"><i class="fas fa-check-circle"></i></span> Advanced</span>
+            <div style="margin-top:16px; display:flex; gap:16px; font-size:0.75rem; color:var(--secondary);">
+                <span><span class="skill-item skill-level-expert" style="font-size:0.7rem; padding:4px 10px;"><i class="fas fa-star"></i></span> Expert</span>
+                <span><span class="skill-item skill-level-advanced" style="font-size:0.7rem; padding:4px 10px;"><i class="fas fa-check-circle"></i></span> Advanced</span>
             </div>
         </section>'''
     
