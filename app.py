@@ -1,5 +1,5 @@
 # app.py - Main Application (बहुत छोटी और साफ)
-from flask import Flask
+from flask import Flask, app
 from config import Config
 from models import db
 from utils.helpers import create_directories
@@ -32,7 +32,9 @@ def create_app():
     from blueprints.jobs import jobs_bp
     from blueprints.main import main_bp
     from blueprints.scraper import scraper_bp, start_job_scraper  # ⭐ scraper import
-    
+    from blueprints.admin import admin_bp
+
+    app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)

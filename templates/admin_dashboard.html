@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Professionals Data Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container { padding: 30px 0; }
+    .admin-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-radius: 20px;
+        padding: 30px;
+        color: white;
+        margin-bottom: 24px;
+    }
+    .admin-header h1 { font-family: 'Playfair Display', serif; font-weight: 800; margin: 0; }
+    .admin-header p { opacity: 0.7; margin: 4px 0 0; }
+    
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        text-align: center;
+        transition: all 0.3s;
+        margin-bottom: 16px;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
+    .stat-card .stat-number { font-size: 2rem; font-weight: 800; }
+    .stat-card .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .stat-card.purple .stat-number { color: #8b5cf6; }
+    .stat-card.green .stat-number { color: #10b981; }
+    .stat-card.blue .stat-number { color: #3b82f6; }
+    .stat-card.orange .stat-number { color: #f59e0b; }
+    .stat-card.red .stat-number { color: #ef4444; }
+    
+    .nav-pills .nav-link {
+        border-radius: 10px;
+        padding: 10px 16px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    .nav-pills .nav-link.active { background: #8b5cf6; }
+    
+    .table td { vertical-align: middle; font-size: 0.85rem; }
+    .btn-delete { padding: 4px 10px; font-size: 0.7rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="container-fluid">
+        
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-crown me-2"></i>Admin Dashboard</h1>
+                    <p>Manage users, jobs, and view reports</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-light me-2">
+                        <i class="fas fa-chart-bar me-1"></i>Reports
+                    </a>
+                    <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-outline-light">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="row">
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card purple">
+                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card green">
+                    <div class="stat-number">{{ total_professionals }}</div>
+                    <div class="stat-label">Professionals</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card blue">
+                    <div class="stat-number">{{ total_employers }}</div>
+                    <div class="stat-label">Employers</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card orange">
+                    <div class="stat-number">{{ total_jobs }}</div>
+                    <div class="stat-label">Total Jobs</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card green">
+                    <div class="stat-number">{{ active_jobs }}</div>
+                    <div class="stat-label">Active Jobs</div>
+                </div>
+            </div>
+            <div class="col-xl-2 col-md-4 col-6">
+                <div class="stat-card red">
+                    <div class="stat-number">{{ scraped_jobs }}</div>
+                    <div class="stat-label">Scraped Jobs</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Navigation -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin.admin_users') }}">
+                            <i class="fas fa-users me-1"></i>Manage Users
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="{{ url_for('admin.admin_jobs') }}">
+                            <i class="fas fa-briefcase me-1"></i>Manage Jobs
+                        </a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="{{ url_for('admin.admin_reports') }}">
+                            <i class="fas fa-chart-pie me-1"></i>View Reports
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Recent Users -->
+        <div class="card mb-3">
+            <div class="card-header fw-bold">
+                <i class="fas fa-users me-2"></i>Recent Users
+                <a href="{{ url_for('admin.admin_users') }}" class="btn btn-sm btn-outline-primary float-end">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th><th>Email</th><th>Domain</th><th>Type</th><th>Joined</th><th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in recent_users %}
+                            <tr>
+                                <td class="fw-bold">{{ user.full_name[:30] }}</td>
+                                <td>{{ user.email[:25] }}</td>
+                                <td>{{ user.domain[:20] }}</td>
+                                <td>
+                                    {% if user.user_type == 'employer' %}
+                                    <span class="badge bg-success">Employer</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">Professional</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at.strftime('%d %b') if user.created_at else '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger btn-delete" 
+                                            data-action="delete-user"
+                                            data-user-id="{{ user.id }}"
+                                            data-user-name="{{ user.full_name }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Jobs -->
+        <div class="card">
+            <div class="card-header fw-bold">
+                <i class="fas fa-briefcase me-2"></i>Recent Jobs
+                <a href="{{ url_for('admin.admin_jobs') }}" class="btn btn-sm btn-outline-primary float-end">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Title</th><th>Company</th><th>Location</th><th>Source</th><th>Posted</th><th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in recent_jobs %}
+                            <tr>
+                                <td class="fw-bold">{{ job.title[:40] }}</td>
+                                <td>{{ job.company[:25] }}</td>
+                                <td>{{ job.location[:20] }}</td>
+                                <td>
+                                    {% if job.source == 'scraped' %}
+                                    <span class="badge bg-info">Scraped</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">User</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ job.posted_date.strftime('%d %b') if job.posted_date else '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger btn-delete" 
+                                            data-action="delete-job"
+                                            data-job-id="{{ job.id }}"
+                                            data-job-title="{{ job.title[:40] }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    function deleteUser(id, name) {
+        if (confirm(`Delete user "${name}"?\\nThis action cannot be undone!`)) {
+            fetch(`/admin/delete-user/${id}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) { alert('✅ User deleted!'); location.reload(); }
+                    else { alert('❌ ' + data.message); }
+                });
+        }
+    }
+    
+    function deleteJob(id, title) {
+        if (confirm(`Delete job "${title}"?\\nThis action cannot be undone!`)) {
+            fetch(`/admin/delete-job/${id}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) { alert('✅ Job deleted!'); location.reload(); }
+                    else { alert('❌ ' + data.message); }
+                });
+        }
+    }
+    
+    // Event listeners for delete buttons
+    document.querySelectorAll('[data-action="delete-user"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const userId = this.getAttribute('data-user-id');
+            const userName = this.getAttribute('data-user-name');
+            deleteUser(userId, userName);
+        });
+    });
+    
+    document.querySelectorAll('[data-action="delete-job"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const jobId = this.getAttribute('data-job-id');
+            const jobTitle = this.getAttribute('data-job-title');
+            deleteJob(jobId, jobTitle);
+        });
+    });
+</script>
+{% endblock %}

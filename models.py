@@ -41,7 +41,14 @@ class User(db.Model):
     profile_url = db.Column(db.String(200), default='')
     show_email = db.Column(db.Boolean, default=False) 
     show_mobile = db.Column(db.Boolean, default=False) 
-
+# models.py में जोड़ें
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(100), default='Admin')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Job(db.Model):
     __tablename__ = 'job'

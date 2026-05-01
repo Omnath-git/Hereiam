@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Professionals Data Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        padding: 20px;
+    }
+    .admin-login-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+    }
+    .admin-icon {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 2rem;
+        color: #f59e0b;
+    }
+    .admin-login-card h2 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    .admin-login-card .subtitle {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 28px;
+    }
+    .input-group-text {
+        background: #f8fafc;
+        border-right: none;
+    }
+    .form-control {
+        border-left: none;
+        font-size: 1rem;
+    }
+    .form-control:focus {
+        box-shadow: none;
+        border-color: #6366f1;
+    }
+    .btn-get-otp {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .btn-get-otp:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245,158,11,0.3);
+    }
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16,185,129,0.3);
+    }
+    .otp-input {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 10px;
+    }
+    .email-display {
+        background: #f1f5f9;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        color: #6366f1;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-login-container">
+    <div class="admin-login-card">
+        <div class="admin-icon">
+            <i class="fas fa-shield-haltered"></i>
+        </div>
+        <h2>Admin Panel</h2>
+        <p class="subtitle">Secure OTP-based authentication. Please also check your spam/junk folder.</p>
+        
+        {% if not otp_sent %}
+        <!-- ⭐ STEP 1: Get OTP -->
+        <form method="POST">
+            <input type="hidden" name="action" value="get_otp">
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" name="email" class="form-control" 
+                       value="omnath.mail@gmail.com" readonly
+                       style="background:#f8fafc;cursor:not-allowed;">
+            </div>
+            <button type="submit" class="btn-get-otp">
+                <i class="fas fa-key me-2"></i>Get OTP on Email
+            </button>
+        </form>
+        {% else %}
+        <!-- ⭐ STEP 2: Enter OTP & Login -->
+        <div class="email-display">
+            <i class="fas fa-envelope me-2"></i>{{ email }}
+        </div>
+        <form method="POST">
+            <input type="hidden" name="action" value="login">
+            <div class="mb-3">
+                <input type="text" name="otp" class="form-control otp-input" 
+                       placeholder="••••••" maxlength="6" pattern="[0-9]{6}" 
+                       inputmode="numeric" required autofocus>
+            </div>
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </button>
+        </form>
+        {% endif %}
+        
+        <a href="{{ url_for('main.index') }}" class="d-block mt-3 text-muted small">
+            <i class="fas fa-arrow-left me-1"></i>Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}
