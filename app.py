@@ -9,7 +9,10 @@ from utils.helpers import create_directories
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-   
+    @app.route('/admin-login')
+    def admin_login_direct():
+        from blueprints.admin import admin_login
+        return admin_login()
     # ⭐ SQLite Lock Fix
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'connect_args': {
