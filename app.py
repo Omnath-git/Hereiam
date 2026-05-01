@@ -9,10 +9,7 @@ from utils.helpers import create_directories
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    @app.route('/admin-login')
-    def admin_login_direct():
-        from blueprints.admin import admin_login
-        return admin_login()
+   
     # ⭐ SQLite Lock Fix
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
         'connect_args': {
@@ -23,10 +20,7 @@ def create_app():
         'pool_recycle': 3600,
         'pool_pre_ping': True,
     }
-@app.route('/admin-login', methods=['GET', 'POST'])
-def admin_login():
-    from blueprints.admin import admin_bp
-    return admin_bp.view_functions['admin_login']()    
+    
 
     db.init_app(app)
     create_directories(app)
@@ -50,7 +44,14 @@ def admin_login():
     
     # ⭐ Start job scraper
     # start_job_scraper(app)
-    
+    @app.route('/admin-login')
+    def admin_login_direct():
+        from blueprints.admin import admin_login
+        return admin_login()
+    @app.route('/admin-dashboard')
+    def admin_dashboard_direct():
+        from blueprints.admin import admin_dashboard
+        return admin_dashboard()
     return app
 if __name__ == '__main__':
     app = create_app()
