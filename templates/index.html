@@ -397,12 +397,34 @@
         .header-stat .stat-number { font-size: 1.6rem; }
         .header-stat .stat-label { font-size: 0.65rem; }
     }
+        .support-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s;
+        animation: pulse 2s infinite;
+    }
+    .support-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(245,158,11,0.4);
+        color: white;
+    }
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+        50% { box-shadow: 0 0 0 10px rgba(245,158,11,0); }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-2">
-    
+
     <!-- Tab Navigation -->
     <ul class="nav main-tabs">
         <li class="nav-item">

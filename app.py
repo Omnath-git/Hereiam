@@ -33,7 +33,9 @@ def create_app():
     from blueprints.main import main_bp
     from blueprints.scraper import scraper_bp, start_job_scraper  # ⭐ scraper import
     from blueprints.admin import admin_bp
-
+    from blueprints.donate import donate_bp
+    
+    app.register_blueprint(donate_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
@@ -43,7 +45,7 @@ def create_app():
     app.register_blueprint(scraper_bp)  # ⭐ scraper blueprint register
     
     # ⭐ Start job scraper
-    # start_job_scraper(app)
+    start_job_scraper(app)
     @app.route('/admin-login')
     def admin_login_direct():
         from blueprints.admin import admin_login

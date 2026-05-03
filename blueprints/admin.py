@@ -2,7 +2,7 @@
 import random
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from models import db, User, Job, Admin
+from models import db, User, Job, Admin, Donation
 from utils.email_otp import send_email_otp, generate_otp,send_admin_otp
 
 admin_bp = Blueprint('admin', __name__)
@@ -288,7 +288,22 @@ def admin_reports():
                          user_type_stats=user_type_stats,
                          daily_registrations=daily_registrations,
                          job_source_stats=job_source_stats)
+# blueprints/admin.py में
 
+@admin_bp.route('/admin/donations')
+def admin_donations():
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin.admin_login'))
+    
+    donations = Donation.query.order_by(Donation.created_at.desc()).all()
+    total_donations = db.session.query(db.func.sum(Donation.amount))\
+        .filter(Donation.status == 'success').scalar() or 0
+    total_donors = Donation.query.filter_by(status='success').count()
+    
+    return render_template('admin_donations.html',
+                         donations=donations,
+                         total_donations=total_donations,
+                         total_donors=total_donors)
 
 @admin_bp.route('/admin/logout')
 def admin_logout():

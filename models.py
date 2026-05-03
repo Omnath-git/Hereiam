@@ -49,7 +49,27 @@ class Admin(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     name = db.Column(db.String(100), default='Admin')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+# models.py में जोड़ें
 
+class Donation(db.Model):
+    __tablename__ = 'donation'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    donor_name = db.Column(db.String(100))
+    donor_email = db.Column(db.String(120))
+    donor_mobile = db.Column(db.String(20))
+    amount = db.Column(db.Float, nullable=False)
+    currency = db.Column(db.String(10), default='INR')
+    payment_id = db.Column(db.String(100))  # Razorpay payment ID
+    order_id = db.Column(db.String(100))    # Razorpay order ID
+    status = db.Column(db.String(20), default='pending')  # pending, success, failed
+    payment_method = db.Column(db.String(50))  # UPI, Card, NetBanking, etc.
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationship
+    user = db.relationship('User', backref='donations')
 class Job(db.Model):
     __tablename__ = 'job'
     

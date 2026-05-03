@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Support Us - Here I Am{% endblock %}
+
+{% block extra_css %}
+<style>
+    .donate-container {
+        padding: 40px 0;
+        min-height: 80vh;
+        background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    }
+    
+    .donate-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    
+    .donate-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 2.5rem;
+    }
+    
+    .donate-card h2 {
+        font-family: 'Playfair Display', serif;
+        text-align: center;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    
+    .donate-card .subtitle {
+        text-align: center;
+        color: #64748b;
+        margin-bottom: 28px;
+        font-size: 0.95rem;
+    }
+    
+    /* Amount Buttons */
+    .amount-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    
+    .amount-btn {
+        padding: 12px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        background: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .amount-btn:hover {
+        border-color: #8b5cf6;
+        background: #f5f3ff;
+    }
+    
+    .amount-btn.selected {
+        border-color: #8b5cf6;
+        background: #8b5cf6;
+        color: white;
+    }
+    
+    /* Custom Amount */
+    .custom-amount {
+        display: flex;
+        align-items: center;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 8px 16px;
+        margin-bottom: 20px;
+        transition: all 0.2s;
+    }
+    
+    .custom-amount:focus-within {
+        border-color: #8b5cf6;
+    }
+    
+    .custom-amount .currency {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-right: 8px;
+    }
+    
+    .custom-amount input {
+        border: none;
+        outline: none;
+        font-size: 1.2rem;
+        font-weight: 700;
+        width: 100%;
+        background: transparent;
+    }
+    
+    /* Form */
+    .form-group {
+        margin-bottom: 14px;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: #374151;
+        margin-bottom: 4px;
+        display: block;
+    }
+    
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #8b5cf6;
+    }
+    
+    .btn-donate {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-donate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(245,158,11,0.3);
+    }
+    
+    .btn-donate:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Thank You */
+    .thank-you {
+        text-align: center;
+        padding: 40px 20px;
+        display: none;
+    }
+    
+    .thank-you.show { display: block; }
+    
+    .thank-you-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+    }
+    
+    @media (max-width: 480px) {
+        .donate-card { padding: 24px 16px; border-radius: 16px; }
+        .amount-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="donate-container">
+    <div class="container">
+        <div class="donate-card" id="donateForm">
+            <div class="donate-icon">💛</div>
+            <h2>Support Our Mission</h2>
+            <p class="subtitle">Your contribution helps us keep this platform free for everyone</p>
+            
+            <!-- Amount Selection -->
+            <div class="amount-grid" id="amountGrid">
+                <button class="amount-btn" data-amount="50">₹50</button>
+                <button class="amount-btn selected" data-amount="100">₹100</button>
+                <button class="amount-btn" data-amount="500">₹500</button>
+                <button class="amount-btn" data-amount="1000">₹1000</button>
+            </div>
+            
+            <!-- Custom Amount -->
+            <div class="custom-amount">
+                <span class="currency">₹</span>
+                <input type="number" id="customAmount" placeholder="Enter custom amount" min="10" max="100000">
+            </div>
+            
+            <!-- Donor Info -->
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" id="donorName" placeholder="Anonymous">
+            </div>
+            
+            <div class="form-group">
+                <label>Email (for receipt)</label>
+                <input type="email" id="donorEmail" placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label>Message (Optional)</label>
+                <textarea id="donorMessage" rows="2" placeholder="Keep up the good work!"></textarea>
+            </div>
+            
+            <button class="btn-donate" id="payBtn" onclick="initiateDonation()">
+                <i class="fas fa-heart me-2"></i>Donate Now
+            </button>
+        </div>
+        
+        <!-- Thank You -->
+        <div class="thank-you" id="thankYou">
+            <div class="thank-you-icon">🎉</div>
+            <h2 style="color:#1e293b;">Thank You!</h2>
+            <p style="color:#64748b;">Your support means the world to us</p>
+            <p><strong id="donationAmount"></strong></p>
+            <button class="btn-donate" style="width:auto;padding:10px 30px;margin-top:16px;" 
+                    onclick="location.reload()">
+                <i class="fas fa-redo me-2"></i>Donate Again
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    let selectedAmount = 100;
+    
+    // Amount buttons
+    document.querySelectorAll('.amount-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedAmount = parseInt(this.dataset.amount);
+            document.getElementById('customAmount').value = '';
+        });
+    });
+    
+    // Custom amount
+    document.getElementById('customAmount').addEventListener('input', function() {
+        if (this.value) {
+            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+            selectedAmount = parseInt(this.value) || 0;
+        }
+    });
+    
+    function initiateDonation() {
+        const amount = selectedAmount || parseInt(document.getElementById('customAmount').value) || 0;
+        
+        if (amount < 10) {
+            alert('Minimum donation is ₹10');
+            return;
+        }
+        
+        const name = document.getElementById('donorName').value || 'Anonymous';
+        const email = document.getElementById('donorEmail').value || '';
+        const mobile = '';  
+        const message = document.getElementById('donorMessage').value || '';
+        
+        const btn = document.getElementById('payBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        
+        // Create order
+        fetch('/api/create-donation-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({amount, name, email, mobile, message})
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-heart me-2"></i>Donate Now';
+                return;
+            }
+            
+            // Open Razorpay
+            const options = {
+                key: '{{ razorpay_key_id }}',
+                amount: data.amount,
+                currency: data.currency,
+                name: 'Here I Am',
+                description: 'Support Our Platform',
+                image: '/static/uploads/logo.png',
+                order_id: data.order_id,
+                handler: function(response) {
+                    // Verify payment
+                    fetch('/api/verify-donation', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature
+                        })
+                    })
+                    .then(r => r.json())
+                    .then(verifyData => {
+                        if (verifyData.success) {
+                            document.getElementById('donateForm').style.display = 'none';
+                            document.getElementById('thankYou').classList.add('show');
+                            document.getElementById('donationAmount').textContent = 
+                                `₹${amount} donated successfully!`;
+                        } else {
+                            alert('Payment verification failed! Contact support.');
+                        }
+                    });
+                },
+                prefill: {
+                    name: name,
+                    email: email,
+                    contact: mobile
+                },
+                theme: { color: '#8b5cf6' },
+                modal: {
+                    ondismiss: function() {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-heart me-2"></i>Donate Now';
+                    }
+                }
+            };
+            
+            const rzp = new Razorpay(options);
+            rzp.open();
+        })
+        .catch(err => {
+            alert('Something went wrong! Please try again.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-heart me-2"></i>Donate Now';
+        });
+    }
+</script>
+{% endblock %}

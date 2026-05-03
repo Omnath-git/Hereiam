@@ -599,7 +599,7 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <!-- Home -->
                     <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" 
+                        <a class="nav-link btn-nav-register {% if request.endpoint == 'main.index' %}active{% endif %}" 
                            href="{{ url_for('main.index') }}">
                             <i class="fas fa-home me-1"></i> Home
                         </a>
@@ -654,7 +654,7 @@
                     {% else %}
                         <!-- Login -->
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}" 
+                            <a class="nav-link btn-nav-register {% if request.endpoint == 'auth.login' %}active{% endif %}" 
                                href="{{ url_for('auth.login') }}">
                                 <i class="fas fa-sign-in-alt me-1"></i> Login
                             </a>
@@ -667,6 +667,9 @@
                                 <i class="fas fa-user-plus me-1"></i> Register Free
                             </a>
                         </li>
+                        <a href="{{ url_for('donate.donate_page') }}" class="support-btn">
+                            <i class="fas fa-heart"></i> Support Us
+                        </a>
                     {% endif %}
                 </ul>
             </div>
