@@ -3,834 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Here I am - Connect with top talent or find your dream job">
-    <meta name="keywords" content="job portal, talent platform, free job listings, professional networking. Get your free, personalized website, Showcase your skills, projects, and experience with a custom domain. Perfect for professionals, students, and anyone looking to make an impact online. Create your site in minutes and share it with the world!">
-    <meta name="author" content="Here I am Team">
-    <meta name="robots" content="index, follow">
+    <meta name="description" content="Here I Am - Free job portal and professional networking platform">
     <meta name="theme-color" content="#8b5cf6">
     
-    <title>{% block title %}Here I am{% endblock %}</title>
+    <title>{% block title %}Here I Am{% endblock %}</title>
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <style>
-        /* ============================================================
-           CSS VARIABLES & DESIGN SYSTEM
-           ============================================================ */
         :root {
-            --primary: #8b5cf6;
-            --primary-light: #a78bfa;
-            --primary-dark: #7c3aed;
-            --primary-bg: #f5f3ff;
-            --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            
-            --secondary: #64748b;
-            --secondary-light: #94a3b8;
-            --secondary-dark: #475569;
-            
-            --success: #10b981;
-            --success-light: #d1fae5;
-            --success-dark: #059669;
-            
-            --warning: #f59e0b;
-            --warning-light: #fef3c7;
-            --warning-dark: #d97706;
-            
-            --danger: #ef4444;
-            --danger-light: #fee2e2;
-            --danger-dark: #dc2626;
-            
-            --info: #3b82f6;
-            --info-light: #dbeafe;
-            --info-dark: #2563eb;
-            
-            --white: #ffffff;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            
+            --primary: #8b5cf6; --primary-light: #a78bfa; --primary-dark: #7c3aed;
+            --primary-bg: #f5f3ff; --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            --secondary: #64748b; --dark: #0f172a; --dark-2: #1e293b;
+            --light: #f8fafc; --light-2: #f1f5f9; --white: #ffffff;
+            --success: #10b981; --success-light: #d1fae5; --warning: #f59e0b;
+            --warning-light: #fef3c7; --danger: #ef4444; --danger-light: #fee2e2;
+            --info: #3b82f6; --info-light: #dbeafe; --purple: #8b5cf6;
             --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-dark: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-            --gradient-light: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            
-            --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
-            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-            --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.15);
-            
-            --radius-xs: 4px;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --radius-2xl: 24px;
-            --radius-full: 9999px;
-            
-            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-            
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
-            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
-            
-            --navbar-height: 68px;
-            --container-max: 1280px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,.04); --shadow-md: 0 4px 8px rgba(0,0,0,.06);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,.08); --shadow-xl: 0 20px 40px rgba(0,0,0,.1);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 20px; --radius-full: 9999px;
+            --transition-fast: 150ms ease; --transition-base: 250ms ease;
+            --font-sans: 'Inter', sans-serif; --font-display: 'Playfair Display', serif;
+            --font-mono: 'JetBrains Mono', monospace; --navbar-height: 68px;
         }
         
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-            -webkit-text-size-adjust: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: var(--font-sans);
-            background: var(--gray-100);
-            color: var(--gray-800);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: var(--font-sans); background: #f1f5f9; color: var(--dark-2);
+            line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh;
+            display: flex; flex-direction: column;
         }
         
-        a {
-            color: var(--danger-dark);
-            text-decoration: none;
-            transition: color var(--transition-fast);
-        }
+        a { color: var(--primary); text-decoration: none; transition: color var(--transition-fast); }
+        a:hover { color: var(--primary-dark); }
         
-        a:hover {
-            color: var(--primary-dark);
-        }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--gray-100);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--gray-300);
-            border-radius: var(--radius-full);
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray-400);
-        }
-        
-        ::selection {
-            background: var(--primary);
-            color: var(--white);
-        }
-        
-        /* ============================================================
-           NAVBAR
-           ============================================================ */
+        /* Navbar */
         .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-sm);
-            padding: 0;
-            height: var(--navbar-height);
-            border-bottom: 1px solid var(--gray-200);
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            transition: all var(--transition-base);
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm); padding: 0; height: var(--navbar-height);
+            border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 1030;
         }
-        
-        .navbar.scrolled {
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .navbar .container {
-            height: 100%;
-        }
+        .navbar .container { height: 100%; }
         
         .navbar-brand {
-            font-family: var(--font-display);
-            font-size: 1.35rem;
-            font-weight: 800;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0;
-            letter-spacing: -0.5px;
-            text-decoration: none;
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+            font-family: var(--font-display); font-size: 1.2rem; font-weight: 800;
+            color: var(--dark); letter-spacing: -0.5px;
         }
-        
-        .navbar-brand .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-gradient);
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-size: 1.2rem;
-            -webkit-text-fill-color: white;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-        }
-        
-        .navbar-nav {
-            gap: 4px;
-        }
+        .navbar-brand img { height: 34px; width: auto; }
         
         .nav-link {
-            color: var(--gray-600) !important;
-            font-weight: 500;
-            font-size: 0.875rem;
-            padding: 8px 16px !important;
-            border-radius: var(--radius-md);
-            transition: all var(--transition-fast);
-            position: relative;
-            white-space: nowrap;
+            color: #64748b !important; font-weight: 500; font-size: 0.85rem;
+            padding: 8px 14px !important; border-radius: var(--radius-sm); transition: all var(--transition-fast);
         }
-        
-        .nav-link:hover {
-            color: var(--primary) !important;
-            background: var(--primary-bg);
-        }
-        
-        .nav-link.active {
-            color: var(--primary-dark) !important;
-            background: var(--primary-bg);
-            font-weight: 600;
-        }
-        
-        .nav-link i {
-            width: 18px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
+        .nav-link:hover { color: var(--primary) !important; background: var(--primary-bg); }
+        .nav-link.active { color: var(--primary-dark) !important; background: var(--primary-bg); font-weight: 600; }
         
         .nav-link.btn-nav-register {
-            background: var(--primary-gradient);
-            color: var(--white) !important;
-            padding: 10px 20px !important;
-            border-radius: var(--radius-full);
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            background: var(--primary-gradient); color: white !important;
+            padding: 9px 18px !important; border-radius: var(--radius-full); font-weight: 600;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        }
+        .nav-link.btn-nav-register:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(139,92,246,0.4); color: white !important; }
+        
+        /* ⭐ Support Us Button */
+        .support-nav-btn {
+            display: inline-flex !important; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            color: white !important; padding: 8px 16px !important;
+            border-radius: 50px !important; font-weight: 700 !important;
+            font-size: 0.82rem !important; text-decoration: none !important;
+            transition: all 0.3s !important; animation: pulse-support 2s infinite;
+            white-space: nowrap; border: none !important; line-height: 1.4;
+        }
+        .support-nav-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(245,158,11,0.4); color: white !important; }
+        
+        @keyframes pulse-support {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245,158,11,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(245,158,11,0); }
         }
         
-        .nav-link.btn-nav-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
-            color: var(--white) !important;
-        }
-        
-        .nav-link.text-danger {
-            color: var(--danger) !important;
-        }
-        
-        .nav-link.text-danger:hover {
-            background: var(--danger-light);
-            color: var(--danger-dark) !important;
-        }
-        
-        .navbar-toggler {
-            border: none;
-            padding: 8px;
-            color: var(--gray-600);
-        }
-        
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-            outline: none;
-        }
-        
-        /* User Badge */
-        .nav-user-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 12px 4px 4px;
-            background: var(--gray-100);
-            border-radius: var(--radius-full);
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--gray-700);
-        }
-        
-        .nav-user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary-light);
-        }
-        
-        .badge-employer {
-            background: var(--success) !important;
-            color: white !important;
-            font-size: 0.65rem;
-            padding: 2px 8px;
-        }
-        
-        .badge-professional {
-            background: var(--primary) !important;
-            color: white !important;
-            font-size: 0.65rem;
-            padding: 2px 8px;
-        }
-        
-        /* ============================================================
-           FLASH MESSAGES (TOAST)
-           ============================================================ */
-        .flash-container {
-            position: fixed;
-            top: calc(var(--navbar-height) + 16px);
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 440px;
-            pointer-events: none;
-        }
-        
+        /* Flash Messages */
+        .flash-container { position: fixed; top: calc(var(--navbar-height) + 12px); right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; max-width: 420px; pointer-events: none; }
         .flash-alert {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 16px 18px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            animation: toastSlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                       toastFadeOut 0.4s ease 4.6s forwards;
-            position: relative;
-            overflow: hidden;
-            pointer-events: auto;
+            display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px;
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); pointer-events: auto;
+            animation: toastSlideIn 0.4s ease, toastFadeOut 0.4s ease 4.6s forwards;
         }
+        .flash-alert.success { background: linear-gradient(135deg, #059669, #10b981); color: white; }
+        .flash-alert.error, .flash-alert.danger { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; }
+        .flash-alert.warning { background: linear-gradient(135deg, #d97706, #f59e0b); color: white; }
+        .flash-alert.info { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; }
         
-        .flash-alert::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: rgba(255,255,255,0.3);
-            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-        }
+        @keyframes toastSlideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes toastFadeOut { from { opacity: 1; } to { opacity: 0; } }
         
-        .flash-alert::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.4);
-            animation: toastCountdown 5s linear forwards;
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-        }
+        main { flex: 1; padding-bottom: 20px; }
         
-        .flash-alert.success {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: var(--white);
-        }
-        
-        .flash-alert.error,
-        .flash-alert.danger {
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-            color: var(--white);
-        }
-        
-        .flash-alert.warning {
-            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
-            color: var(--white);
-        }
-        
-        .flash-alert.info {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-            color: var(--white);
-        }
-        
-        .flash-icon {
-            font-size: 1.4rem;
-            flex-shrink: 0;
-            margin-top: 1px;
-            opacity: 0.95;
-        }
-        
-        .flash-content {
-            flex: 1;
-            font-size: 0.875rem;
-            font-weight: 500;
-            line-height: 1.5;
-            min-width: 0;
-        }
-        
-        .flash-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: var(--white);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            flex-shrink: 0;
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-        
-        .flash-close:hover {
-            background: rgba(255,255,255,0.35);
-            opacity: 1;
-            transform: rotate(90deg);
-        }
-        
-        @keyframes toastSlideIn {
-            from {
-                transform: translateX(120%) scale(0.9);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0) scale(1);
-                opacity: 1;
-            }
-        }
-        
-        @keyframes toastFadeOut {
-            from {
-                opacity: 1;
-                transform: translateX(0) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(60px) scale(0.95);
-            }
-        }
-        
-        @keyframes toastCountdown {
-            from { width: 100%; }
-            to { width: 0%; }
-        }
-        
-        /* ============================================================
-           MAIN CONTENT
-           ============================================================ */
-        main {
-            flex: 1;
-            min-height: calc(100vh - var(--navbar-height));
-            padding-bottom: 40px;
-        }
-        
-        /* ============================================================
-           FOOTER
-           ============================================================ */
         .app-footer {
-            background: var(--white);
-            border-top: 1px solid var(--gray-200);
-            padding: 20px 0;
-            text-align: center;
-            color: var(--gray-500);
-            font-size: 0.8rem;
-            font-weight: 500;
+            background: white; border-top: 1px solid #e2e8f0; padding: 16px 0;
+            text-align: center; color: #64748b; font-size: 0.78rem;
         }
         
-        .app-footer a {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .app-footer a:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-        
-        /* ============================================================
-           UTILITY CLASSES
-           ============================================================ */
-        .text-gradient {
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .hover-lift {
-            transition: transform var(--transition-base), box-shadow var(--transition-base);
-        }
-        
-        .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-xl);
-        }
-        
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
         @media (max-width: 992px) {
-            .navbar-collapse {
-                background: var(--white);
-                padding: 16px;
-                border-radius: var(--radius-lg);
-                box-shadow: var(--shadow-xl);
-                margin-top: 8px;
-                border: 1px solid var(--gray-200);
-            }
-            
-            .navbar-nav {
-                gap: 1px;
-            }
-            
-            .nav-link {
-                border-radius: var(--radius-sm);
-            }
+            .navbar-collapse { background: white; padding: 12px; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); margin-top: 8px; }
+            .support-nav-btn { margin-top: 4px; }
         }
-        
         @media (max-width: 576px) {
-            :root {
-                --navbar-height: 60px;
-            }
-            
-            .flash-container {
-                top: calc(var(--navbar-height) + 4px);
-                right: 8px;
-                left: 1px;
-                max-width: none;
-            }
-            
-            .flash-alert {
-                min-width: auto;
-                padding: 14px 16px;
-            }
-            
-            .navbar-brand {
-                font-size: 1.15rem;
-            }
-            
-            .navbar-brand .brand-icon {
-                width: 34px;
-                height: 34px;
-                font-size: 1rem;
-            }
-        }
-        
-        @media print {
-            .navbar,
-            .flash-container,
-            .app-footer {
-                display: none !important;
-            }
-            
-            body {
-                background: white;
-            }
-        }
-        
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+            :root { --navbar-height: 60px; }
+            .flash-container { top: calc(var(--navbar-height) + 4px); right: 4px; left: 4px; max-width: none; }
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- ================================================================
-         NAVIGATION BAR
-         ================================================================ -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg" id="mainNavbar">
-        <div class="container" style="text-decoration-color: #f00505;">
-            <!-- Brand Logo -->
+        <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-            <img src="{{ url_for('static', filename='Hereiam_logo.png') }}" 
-                 alt="Here I Am" 
-                 height="36"
-                 onerror="this.onerror=null; this.style.display='none';">
-            <span style="font-weight:700; color:#1e293b; font-family:'Playfair Display',serif;">
-                Here I Am
-            </span>
-        </a>
-            <a class="navbar-brand" href="{{ url_for('main.index') }}" >
-                <!-- <span class="brand-icon">
-                    <i class="fas fa-database"></i>
-                </span> -->
-                <!-- Hereiam.in is a free platform for jobs and talent .  -->
-                Get your free, personalized website and Showcase your skills.
+                <img src="{{ url_for('static', filename='Hereiam_logo.png') }}" alt="Here I Am" height="34" onerror="this.style.display='none'">
+                <span>Here I Am</span>
             </a>
             
-            <!-- Mobile Toggle -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <i class="fas fa-bars"></i>
             </button>
             
-            <!-- Navigation Links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <!-- Home -->
                     <li class="nav-item">
-                        <a class="nav-link btn-nav-register {% if request.endpoint == 'main.index' %}active{% endif %}" 
-                           href="{{ url_for('main.index') }}">
+                        <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
                             <i class="fas fa-home me-1"></i> Home
                         </a>
                     </li>
                     
                     {% if session.user_id %}
-                        <!-- Dashboard -->
                         <li class="nav-item">
-                            <a class="nav-link {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}" 
-                               href="{{ url_for('dashboard.dashboard') }}">
+                            <a class="nav-link" href="{{ url_for('dashboard.dashboard') }}">
                                 <i class="fas fa-tachometer-alt me-1"></i> Dashboard
                             </a>
                         </li>
-                        
-                        <!-- ⭐ USER TYPE SPECIFIC LINKS -->
                         {% if session.user_type == 'employer' %}
-                            <!-- Employer Links -->
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'jobs.post_job' %}active{% endif %}" 
-                                   href="{{ url_for('jobs.post_job') }}">
-                                    <i class="fas fa-plus-circle me-1"></i> Post Job
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'jobs.my_jobs' %}active{% endif %}" 
-                                   href="{{ url_for('jobs.my_jobs') }}">
-                                    <i class="fas fa-list me-1"></i> My Jobs
-                                </a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('jobs.post_job') }}"><i class="fas fa-plus-circle me-1"></i> Post Job</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('jobs.my_jobs') }}"><i class="fas fa-list me-1"></i> My Jobs</a></li>
                         {% else %}
-                            <!-- Job Seeker Links -->
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'profile.edit_profile' %}active{% endif %}" 
-                                   href="{{ url_for('profile.edit_profile') }}">
-                                    <i class="fas fa-user-edit me-1"></i> Edit Profile
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'profile.upload_cv' %}active{% endif %}" 
-                                   href="{{ url_for('profile.upload_cv') }}">
-                                    <i class="fas fa-upload me-1"></i> Upload CV
-                                </a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('profile.edit_profile') }}"><i class="fas fa-user-edit me-1"></i> Edit Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{{ url_for('profile.upload_cv') }}"><i class="fas fa-upload me-1"></i> Upload CV</a></li>
                         {% endif %}
-                        
-                        <!-- Logout -->
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
-                                <i class="fas fa-sign-out-alt me-1"></i> Logout
-                            </a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
                     {% else %}
-                        <!-- Login -->
-                        <li class="nav-item">
-                            <a class="nav-link btn-nav-register {% if request.endpoint == 'auth.login' %}active{% endif %}" 
-                               href="{{ url_for('auth.login') }}">
-                                <i class="fas fa-sign-in-alt me-1"></i> Login
-                            </a>
-                        </li>
-                        
-                        <!-- Register Button -->
-                        <li class="nav-item">
-                            <a class="nav-link btn-nav-register {% if request.endpoint == 'main.register' %}active{% endif %}" 
-                               href="{{ url_for('auth.register') }}">
-                                <i class="fas fa-user-plus me-1"></i> Register Free
-                            </a>
-                        </li>
-                        <a href="{{ url_for('donate.donate_page') }}" class="support-btn">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt me-1"></i> Login</a></li>
+                        <li class="nav-item"><a class="nav-link btn-nav-register" href="{{ url_for('auth.register') }}"><i class="fas fa-user-plus me-1"></i> Register Free</a></li>
+                    {% endif %}
+                    
+                    <!-- ⭐ Support Us Button -->
+                    <li class="nav-item d-flex align-items-center ms-lg-2">
+                        <a href="{{ url_for('donate.donate_page') }}" class="support-nav-btn">
                             <i class="fas fa-heart"></i> Support Us
                         </a>
-                    {% endif %}
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
     
-    <!-- ================================================================
-         FLASH MESSAGES (TOAST NOTIFICATIONS)
-         ================================================================ -->
-    <div class="flash-container" id="flashContainer" aria-live="polite" aria-atomic="true">
+    <!-- Flash Messages -->
+    <div class="flash-container" id="flashContainer">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                <div class="flash-alert {{ category }}" 
-                     role="alert" 
-                     data-auto-dismiss="true"
-                     data-delay="5000">
-                    
+                <div class="flash-alert {{ category }}" data-auto-dismiss="true">
                     <div class="flash-icon">
-                        {% if category == 'success' %}
-                            <i class="fas fa-check-circle"></i>
-                        {% elif category == 'error' or category == 'danger' %}
-                            <i class="fas fa-times-circle"></i>
-                        {% elif category == 'warning' %}
-                            <i class="fas fa-exclamation-triangle"></i>
-                        {% else %}
-                            <i class="fas fa-info-circle"></i>
-                        {% endif %}
+                        {% if category == 'success' %}<i class="fas fa-check-circle"></i>
+                        {% elif category in ['error', 'danger'] %}<i class="fas fa-times-circle"></i>
+                        {% elif category == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                        {% else %}<i class="fas fa-info-circle"></i>{% endif %}
                     </div>
-                    
-                    <div class="flash-content">{{ message }}</div>
-                    
-                    <button class="flash-close" onclick="dismissFlash(this)" 
-                            aria-label="Close notification" title="Dismiss">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div class="flash-content" style="font-size:0.85rem;">{{ message }}</div>
+                    <button class="flash-close" onclick="this.parentElement.remove()" style="background:none;border:none;color:white;cursor:pointer;opacity:0.7;">&times;</button>
                 </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
     
-    <!-- ================================================================
-         MAIN CONTENT
-         ================================================================ -->
     <main>
         {% block content %}{% endblock %}
     </main>
     
-    <!-- ================================================================
-         FOOTER
-         ================================================================ -->
     <footer class="app-footer">
         <div class="container">
-            <p class="mb-0">
-                &copy; {{ now().year if now else '2024' }} 
-                <a href="{{ url_for('main.index') }}"> Here I am</a> 
-                &mdash; All rights reserved.
-                <span class="mx-2">|</span>
-                Crafted with <i class="fas fa-heart text-danger"></i> for professionals
-            </p>
+            <p class="mb-0">&copy; {{ now().year if now else '2025' }} <a href="{{ url_for('main.index') }}">Here I Am</a> &mdash; All rights reserved. | Crafted with <i class="fas fa-heart text-danger"></i> for professionals</p>
         </div>
     </footer>
     
-    <!-- ================================================================
-         SCRIPTS
-         ================================================================ -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
-        // ============================================================
-        // FLASH MESSAGE AUTO-DISMISS SYSTEM
-        // ============================================================
-        const FlashManager = {
-            init() {
-                const container = document.getElementById('flashContainer');
-                if (!container) return;
-                
-                const alerts = container.querySelectorAll('.flash-alert[data-auto-dismiss="true"]');
-                
-                alerts.forEach(alert => {
-                    const delay = parseInt(alert.dataset.delay) || 5000;
-                    const timeoutId = setTimeout(() => {
-                        this.dismiss(alert);
-                    }, delay);
-                    
-                    alert.dataset.timeoutId = timeoutId;
-                });
-            },
-            
-            dismiss(alert) {
-                if (!alert || alert.dataset.dismissed === 'true') return;
-                
-                if (alert.dataset.timeoutId) {
-                    clearTimeout(parseInt(alert.dataset.timeoutId));
-                }
-                
-                alert.dataset.dismissed = 'true';
-                alert.style.animation = 'toastFadeOut 0.4s ease forwards';
-                
-                setTimeout(() => {
-                    if (alert.parentNode) {
-                        alert.remove();
-                    }
-                }, 400);
-            },
-            
-            dismissAll() {
-                const container = document.getElementById('flashContainer');
-                if (!container) return;
-                
-                const alerts = container.querySelectorAll('.flash-alert');
-                alerts.forEach(alert => this.dismiss(alert));
-            }
-        };
-        
-        function dismissFlash(button) {
-            const alert = button.closest('.flash-alert');
-            FlashManager.dismiss(alert);
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            FlashManager.init();
-            
-            document.getElementById('flashContainer')?.addEventListener('click', function(e) {
-                const alert = e.target.closest('.flash-alert');
-                if (alert && !e.target.closest('.flash-close')) {
-                    FlashManager.dismiss(alert);
-                }
+        // Auto-dismiss flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.flash-alert[data-auto-dismiss]').forEach(function(alert) {
+                setTimeout(function() { alert.remove(); }, 5000);
             });
-            
-            // Navbar scroll effect
-            const navbar = document.getElementById('mainNavbar');
-            if (navbar) {
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 10) {
-                        navbar.classList.add('scrolled');
-                    } else {
-                        navbar.classList.remove('scrolled');
-                    }
-                });
-            }
-        });
-        
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                FlashManager.dismissAll();
-            }
         });
     </script>
     

@@ -1,29 +1,17 @@
-# app.py - Main Application (बहुत छोटी और साफ)
-from flask import Flask, app
+from flask import Flask
 from config import Config
 from models import db
-from utils.helpers import create_directories
-
-# app.py - create_app() फंक्शन के अंदर
+import os
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-   
-    # ⭐ SQLite Lock Fix
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-        'connect_args': {
-            'timeout': 30,           # 30 सेकंड तक wait करें
-            'check_same_thread': False,  # Multiple threads allow
-        },
-        'pool_size': 10,
-        'pool_recycle': 3600,
-        'pool_pre_ping': True,
-    }
     
-
     db.init_app(app)
-    create_directories(app)
+    
+    # Create directories
+    for folder in [app.config['UPLOAD_FOLDER'], app.config['CV_UPLOAD_FOLDER'], app.config['PROFILES_FOLDER']]:
+        os.makedirs(folder, exist_ok=True)
     
     # Register Blueprints
     from blueprints.auth import auth_bp
@@ -31,32 +19,28 @@ def create_app():
     from blueprints.dashboard import dashboard_bp
     from blueprints.jobs import jobs_bp
     from blueprints.main import main_bp
-    from blueprints.scraper import scraper_bp, start_job_scraper  # ⭐ scraper import
+    from blueprints.scraper import scraper_bp, start_job_scraper
     from blueprints.admin import admin_bp
+    from blueprints.admin_scraper import admin_scraper_bp
     from blueprints.donate import donate_bp
     
-    app.register_blueprint(donate_bp)
-    app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(jobs_bp)
     app.register_blueprint(main_bp)
-    app.register_blueprint(scraper_bp)  # ⭐ scraper blueprint register
+    app.register_blueprint(scraper_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(admin_scraper_bp)
+    app.register_blueprint(donate_bp)
     
-    # ⭐ Start job scraper
+    # Start scraper
     start_job_scraper(app)
-    @app.route('/admin-login')
-    def admin_login_direct():
-        from blueprints.admin import admin_login
-        return admin_login()
-    @app.route('/admin-dashboard')
-    def admin_dashboard_direct():
-        from blueprints.admin import admin_dashboard
-        return admin_dashboard()
+    
     return app
+
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

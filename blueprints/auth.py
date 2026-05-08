@@ -1,12 +1,20 @@
 # blueprints/auth.py
 import random
 import string
+import time
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from models import db, User
 from utils.email_otp import generate_otp, send_email_otp, send_password_reset_otp
+
 auth_bp = Blueprint('auth', __name__)
-otp_storage = {}  # {email: {'otp': '123456', 'expires': datetime, 'attempts': 0}}
+
+# OTP Storage - 30 minutes expiry
+otp_storage = {}  # {email: {'otp': '123456', 'expires': datetime, 'attempts': 0, 'data': {...}}}
+
+# Reset tokens storage
+reset_tokens = {}  # {email: {'otp': '123456', 'expires': datetime, 'attempts': 0, 'user_id': id}}
+
 
 def clean_expired_otps():
     """एक्सपायर्ड OTPs हटाएं"""
@@ -14,6 +22,16 @@ def clean_expired_otps():
     expired = [email for email, data in otp_storage.items() if data['expires'] < now]
     for email in expired:
         del otp_storage[email]
+    
+    # Clean reset tokens too
+    expired_reset = [email for email, data in reset_tokens.items() if data['expires'] < now]
+    for email in expired_reset:
+        del reset_tokens[email]
+
+
+# ============================================================
+# REGISTER
+# ============================================================
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -42,10 +60,10 @@ def register():
             flash('Email or mobile already registered!', 'error')
             return redirect(url_for('auth.register'))
         
-        # Generate OTP
+        # ⭐ Generate OTP with 30 minutes expiry
         clean_expired_otps()
-        otp = generate_otp()
-        expires = datetime.utcnow() + timedelta(minutes=5)
+        otp = generate_otp(6)
+        expires = datetime.utcnow() + timedelta(minutes=30)  # ⭐ 30 MINUTES
         
         otp_storage[email] = {
             'otp': otp,
@@ -56,22 +74,34 @@ def register():
                 'full_name': full_name, 'domain': domain, 'city': city, 'state': state,
                 'user_type': user_type, 'company_name': company_name,
                 'company_website': company_website,
-                'show_email': show_email, 'show_mobile': show_mobile  # ⭐
+                'show_email': show_email, 'show_mobile': show_mobile
             }
         }
         
-        # ⭐ Send email OTP
-        send_email_otp(email, otp, purpose="verify")
+        # Send email OTP
+        success = send_email_otp(email, otp, purpose="verify")
         
-        flash('OTP sent to your email! Please check your inbox.', 'info')
-        return render_template('verify_otp.html', email=email)
+        if success:
+            flash('OTP sent to your email! Please check your inbox (also spam folder).', 'info')
+        else:
+            print(f"\n{'='*60}")
+            print(f"🔑 REGISTRATION OTP for {email}: {otp}")
+            print(f"{'='*60}\n")
+            flash(f'Email sending failed. Check server console for OTP.', 'warning')
+        
+        return render_template('verify_otp.html', email=email, mobile=mobile)
     
     return render_template('register.html')
 
 
+# ============================================================
+# VERIFY OTP
+# ============================================================
+
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
     email = request.form.get('email', '').strip().lower()
+    mobile = request.form.get('mobile', '').strip()
     otp_entered = request.form.get('email_otp', '').strip()
     
     clean_expired_otps()
@@ -82,25 +112,31 @@ def verify_otp():
         flash('OTP expired or not found. Please register again.', 'error')
         return redirect(url_for('auth.register'))
     
-    # Check attempts
-    if stored['attempts'] >= 5:
+    # ⭐ Check attempts (max 5)
+    stored['attempts'] = stored.get('attempts', 0) + 1
+    if stored['attempts'] > 5:
         del otp_storage[email]
         flash('Too many attempts. Please register again.', 'error')
         return redirect(url_for('auth.register'))
     
-    stored['attempts'] += 1
-    
-    # Check OTP
-    if stored['otp'] != otp_entered:
-        remaining = 5 - stored['attempts']
-        flash(f'Invalid OTP! {remaining} attempts remaining.', 'error')
-        return render_template('verify_otp.html', email=email)
-    
-    # Check expiry
+    # ⭐ Check expiry (30 minutes)
     if stored['expires'] < datetime.utcnow():
         del otp_storage[email]
         flash('OTP expired! Please register again.', 'error')
         return redirect(url_for('auth.register'))
+    
+    # ⭐ Compare OTP as strings (simple comparison)
+    stored_otp = str(stored['otp']).strip()
+    entered_otp = str(otp_entered).strip()
+    
+    if stored_otp != entered_otp:
+        remaining = 5 - stored['attempts']
+        if remaining <= 0:
+            del otp_storage[email]
+            flash('Too many attempts. Please register again.', 'error')
+            return redirect(url_for('auth.register'))
+        flash(f'Invalid OTP! {remaining} attempts remaining. OTP: {stored_otp} vs Entered: {entered_otp}', 'error')
+        return render_template('verify_otp.html', email=email, mobile=mobile)
     
     # ⭐ OTP सही है - यूजर बनाएं
     data = stored['data']
@@ -116,16 +152,15 @@ def verify_otp():
         user_type=data['user_type'],
         company_name=data['company_name'],
         company_website=data['company_website'],
-        show_email=data.get('show_email', False),    # ⭐
-        show_mobile=data.get('show_mobile', False),  # ⭐
+        show_email=data.get('show_email', False),
+        show_mobile=data.get('show_mobile', False),
         email_verified=True,
         mobile_verified=False,  # ⭐ Mobile verify नहीं
     )
     
     db.session.add(user)
     
-    # ⭐ Retry on lock
-    import time
+    # ⭐ Retry on database lock
     for attempt in range(5):
         try:
             db.session.commit()
@@ -137,6 +172,7 @@ def verify_otp():
             else:
                 raise e
     
+    # Clean up
     del otp_storage[email]
     session['user_id'] = user.id
     session['user_type'] = user.user_type
@@ -149,14 +185,54 @@ def verify_otp():
         return redirect(url_for('profile.upload_cv'))
 
 
+# ============================================================
+# RESEND OTP
+# ============================================================
+
+@auth_bp.route('/resend-otp', methods=['POST'])
+def resend_otp():
+    """OTP दोबारा भेजें"""
+    email = request.form.get('email', '').strip().lower()
+    
+    clean_expired_otps()
+    stored = otp_storage.get(email)
+    
+    if not stored:
+        flash('Session expired. Please register again.', 'error')
+        return redirect(url_for('auth.register'))
+    
+    # New OTP with 30 minutes expiry
+    otp = generate_otp(6)
+    stored['otp'] = otp
+    stored['expires'] = datetime.utcnow() + timedelta(minutes=30)
+    stored['attempts'] = 0
+    
+    success = send_email_otp(email, otp, purpose="verify")
+    
+    if success:
+        flash('New OTP sent to your email!', 'info')
+    else:
+        print(f"\n{'='*60}")
+        print(f"🔑 RESENT OTP for {email}: {otp}")
+        print(f"{'='*60}\n")
+        flash('New OTP generated. Check server console if email not received.', 'warning')
+    
+    return render_template('verify_otp.html', email=email, mobile=stored['data'].get('mobile', ''))
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
+        user = User.query.filter_by(email=email).first()
+        
+        if user and user.password == password:
             session['user_id'] = user.id
             session['user_type'] = user.user_type
             flash(f'Welcome back, {user.full_name}!', 'success')
@@ -166,20 +242,21 @@ def login():
     return render_template('login.html')
 
 
+# ============================================================
+# LOGOUT
+# ============================================================
+
 @auth_bp.route('/logout')
 def logout():
     session.pop('user_id', None)
     session.pop('user_type', None)
     flash('Logged out successfully!', 'info')
     return redirect(url_for('main.index'))
-# blueprints/auth.py में ये नए रूट्स जोड़ें
+
 
 # ============================================================
-# FORGOT PASSWORD ROUTES
+# FORGOT PASSWORD
 # ============================================================
-
-# Temporary storage for reset tokens
-reset_tokens = {}  # {email: {'otp': '123456', 'expires': datetime}}
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
@@ -195,10 +272,10 @@ def forgot_password():
             flash('If this email is registered, you will receive a reset OTP.', 'info')
             return redirect(url_for('auth.login'))
         
-        # Generate OTP
+        # Generate OTP with 30 minutes expiry
         clean_expired_otps()
-        otp = generate_otp()
-        expires = datetime.utcnow() + timedelta(minutes=10)
+        otp = generate_otp(6)
+        expires = datetime.utcnow() + timedelta(minutes=30)  # ⭐ 30 MINUTES
         
         reset_tokens[email] = {
             'otp': otp,
@@ -208,15 +285,26 @@ def forgot_password():
         }
         
         # Send OTP via email
-        from utils.email_otp import send_email_otp
-        send_password_reset_otp(email, otp)
+        success = send_password_reset_otp(email, otp)
         
         session['reset_email'] = email
-        flash('Password reset OTP sent to your email!', 'success')
+        
+        if success:
+            flash('Password reset OTP sent to your email! Please check spam folder.', 'success')
+        else:
+            print(f"\n{'='*60}")
+            print(f"🔑 PASSWORD RESET OTP for {email}: {otp}")
+            print(f"{'='*60}\n")
+            flash('Email sending failed. Check server console for OTP.', 'warning')
+        
         return redirect(url_for('auth.reset_password'))
     
     return render_template('forgot_password.html')
 
+
+# ============================================================
+# RESET PASSWORD
+# ============================================================
 
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
@@ -249,15 +337,18 @@ def reset_password():
             session.pop('reset_email', None)
             return redirect(url_for('auth.forgot_password'))
         
+        # Check expiry
         if stored['expires'] < datetime.utcnow():
             del reset_tokens[email]
             session.pop('reset_email', None)
             flash('OTP expired! Please request a new one.', 'error')
             return redirect(url_for('auth.forgot_password'))
         
-        stored['attempts'] += 1
+        # Check attempts
+        stored['attempts'] = stored.get('attempts', 0) + 1
         
-        if stored['otp'] != otp_entered:
+        # Compare OTP
+        if str(stored['otp']).strip() != str(otp_entered).strip():
             remaining = 5 - stored['attempts']
             if remaining <= 0:
                 del reset_tokens[email]
@@ -287,6 +378,10 @@ def reset_password():
     return render_template('reset_password.html', email=email)
 
 
+# ============================================================
+# RESEND RESET OTP
+# ============================================================
+
 @auth_bp.route('/resend-reset-otp', methods=['POST'])
 def resend_reset_otp():
     """Resend password reset OTP"""
@@ -302,9 +397,9 @@ def resend_reset_otp():
     if not user:
         return jsonify({'success': False, 'message': 'User not found'}), 400
     
-    # Generate new OTP
-    otp = generate_otp()
-    expires = datetime.utcnow() + timedelta(minutes=10)
+    # Generate new OTP with 30 minutes expiry
+    otp = generate_otp(6)
+    expires = datetime.utcnow() + timedelta(minutes=30)
     
     reset_tokens[email] = {
         'otp': otp,
@@ -314,30 +409,30 @@ def resend_reset_otp():
     }
     
     # Send OTP
-    from utils.email_otp import send_password_reset_otp
-    send_password_reset_otp(email, otp)
+    success = send_password_reset_otp(email, otp)
     
-    return jsonify({'success': True, 'message': 'New OTP sent!'})
+    if success:
+        return jsonify({'success': True, 'message': 'New OTP sent to your email!'})
+    else:
+        print(f"\n{'='*60}")
+        print(f"🔑 RESENT RESET OTP for {email}: {otp}")
+        print(f"{'='*60}\n")
+        return jsonify({'success': True, 'message': 'New OTP generated. Check server console.'})
 
-@auth_bp.route('/resend-otp', methods=['POST'])
-def resend_otp():
-    """OTP दोबारा भेजें"""
-    email = request.form.get('email', '').strip().lower()
+
+# ============================================================
+# GET DEMO OTP (Development only)
+# ============================================================
+
+@auth_bp.route('/get-demo-otp')
+def get_demo_otp():
+    """Get OTP for development (REMOVE IN PRODUCTION)"""
+    email = request.args.get('email')
+    mobile = request.args.get('mobile')
     
-    clean_expired_otps()
-    stored = otp_storage.get(email)
-    
-    if not stored:
-        flash('Session expired. Please register again.', 'error')
-        return redirect(url_for('auth.register'))
-    
-    # New OTP
-    otp = generate_otp()
-    stored['otp'] = otp
-    stored['expires'] = datetime.utcnow() + timedelta(minutes=5)
-    stored['attempts'] = 0
-    
-    send_email_otp(email, otp, purpose="verify")
-    
-    flash('New OTP sent to your email!', 'info')
-    return render_template('verify_otp.html', email=email)
+    if email in otp_storage:
+        return jsonify({
+            'email_otp': otp_storage[email]['otp'],
+            'mobile_otp': '123456'
+        })
+    return jsonify({'error': 'OTP not found'}), 404

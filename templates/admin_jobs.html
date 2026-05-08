@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Jobs - Admin | Here I Am{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container { padding: 30px 0; }
+    .admin-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-radius: 20px;
+        padding: 24px 30px;
+        color: white;
+        margin-bottom: 24px;
+    }
+    .admin-header h1 { font-family: 'Playfair Display', serif; font-weight: 800; margin: 0; font-size: 1.6rem; }
+    
+    .search-box {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        margin-bottom: 20px;
+    }
+    
+    .table td { vertical-align: middle; font-size: 0.85rem; }
+    .btn-delete { padding: 4px 10px; font-size: 0.7rem; }
+    
+    .pagination { justify-content: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="container-fluid">
+        
+        <!-- Header -->
+        <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-briefcase me-2"></i>Manage Jobs</h1>
+                    <p style="opacity:0.7;margin:4px 0 0;">View, search and delete jobs</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search -->
+        <div class="search-box">
+            <form method="GET" class="row g-2">
+                <div class="col-md-6">
+                    <input type="text" name="search" class="form-control" placeholder="Search by title, company, location..." value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="source" class="form-select">
+                        <option value="">All Sources</option>
+                        <option value="scraped" {% if source == 'scraped' %}selected{% endif %}>Scraped</option>
+                        <option value="user" {% if source == 'user' %}selected{% endif %}>User Posted</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Jobs Table -->
+        <div class="card">
+            <div class="card-header fw-bold">
+                <i class="fas fa-list me-2"></i>Jobs ({{ jobs.total }} found)
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Company</th>
+                                <th>Location</th>
+                                <th>Source</th>
+                                <th>Status</th>
+                                <th>Posted</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs.items %}
+                            <tr>
+                                <td>{{ job.id }}</td>
+                                <td class="fw-bold">{{ job.title[:50] }}</td>
+                                <td>{{ job.company[:30] }}</td>
+                                <td>{{ job.location[:25] }}</td>
+                                <td>
+                                    {% if job.source == 'scraped' %}
+                                    <span class="badge bg-info">Scraped</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">User</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if job.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ job.posted_date.strftime('%d %b %Y') if job.posted_date else '-' }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteJob({{ job.id }}, '{{ job.title[:40]|e }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">
+                                    <i class="fas fa-search fa-2x mb-2 d-block"></i>
+                                    No jobs found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if jobs.pages > 1 %}
+            <div class="card-footer">
+                <nav>
+                    <ul class="pagination mb-0">
+                        {% for page_num in jobs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                            {% if page_num %}
+                                <li class="page-item {% if page_num == jobs.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('admin.admin_jobs', page=page_num, search=search, source=source) }}">{{ page_num }}</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-3">
+            <a href="{{ url_for('admin.admin_dashboard') }}" class="text-muted">
+                <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    function deleteJob(id, title) {
+        if (confirm('Delete job "' + title + '"?\nThis cannot be undone!')) {
+            fetch('/admin/delete-job/' + id, { method: 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.success) { alert('Job deleted!'); location.reload(); }
+                    else { alert(data.message || 'Error'); }
+                })
+                .catch(function() { alert('Network error'); });
+        }
+    }
+</script>
+{% endblock %}

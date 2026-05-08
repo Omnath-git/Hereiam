@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Websites - Admin Scraper | Here I Am{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-container { padding: 30px 0; }
+    .admin-header {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-radius: 20px; padding: 24px 30px;
+        color: white; margin-bottom: 24px;
+    }
+    .admin-header h1 { font-family: 'Playfair Display', serif; font-weight: 800; margin: 0; font-size: 1.6rem; }
+    .card { border: none; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); margin-bottom: 20px; }
+    .table td { vertical-align: middle; font-size: 0.85rem; }
+    .badge-active { background: #10b981; }
+    .badge-inactive { background: #ef4444; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="container-fluid">
+        
+        <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="fas fa-globe me-2"></i>Scraper Websites</h1>
+                    <p style="opacity:0.7;margin:4px 0 0;">Manage job scraping websites</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-arrow-left me-1"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('admin_scraper.manage_keywords') }}" class="btn btn-light btn-sm me-2">Keywords</a>
+                    <a href="{{ url_for('admin_scraper.manage_locations') }}" class="btn btn-light btn-sm">Locations</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add Form -->
+        <div class="card">
+            <div class="card-header fw-bold"><i class="fas fa-plus-circle me-2"></i>Add New Website</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_scraper.add_website') }}" class="row g-2">
+                    <div class="col-md-4"><input type="text" name="name" class="form-control form-control-sm" placeholder="Site Name" required></div>
+                    <div class="col-md-4"><input type="text" name="base_url" class="form-control form-control-sm" placeholder="Base URL with {keyword} and {location}" required></div>
+                    <div class="col-md-2"><input type="text" name="card_selectors" class="form-control form-control-sm" placeholder=".job-card, .listing"></div>
+                    <div class="col-md-2"><input type="text" name="title_selectors" class="form-control form-control-sm" placeholder="h3, .title"></div>
+                    <div class="col-md-2"><input type="text" name="company_selectors" class="form-control form-control-sm" placeholder=".company"></div>
+                    <div class="col-md-2"><input type="text" name="location_selectors" class="form-control form-control-sm" placeholder=".location"></div>
+                    <div class="col-md-2"><input type="text" name="link_selector" class="form-control form-control-sm" placeholder="a" value="a"></div>
+                    <div class="col-md-1"><input type="number" name="priority" class="form-control form-control-sm" value="1" min="1" max="3"></div>
+                    <div class="col-md-1"><div class="form-check mt-1"><input class="form-check-input" type="checkbox" name="is_static_url" id="staticUrl"><label class="form-check-label small" for="staticUrl">Static</label></div></div>
+                    <div class="col-md-2"><button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-save me-1"></i>Add</button></div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Websites List -->
+        <div class="card">
+            <div class="card-header fw-bold"><i class="fas fa-list me-2"></i>Websites ({{ websites|length }})</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>Name</th><th>URL</th><th>Priority</th><th>Last Scraped</th><th>Jobs Found</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for w in websites %}
+                            <tr>
+                                <td class="fw-bold">{{ w.name }}</td>
+                                <td><small>{{ w.base_url[:60] }}...</small></td>
+                                <td>{{ w.priority }}</td>
+                                <td>{{ w.last_scraped.strftime('%d %b %Y') if w.last_scraped else 'Never' }}</td>
+                                <td>{{ w.jobs_found or 0 }}</td>
+                                <td>
+                                    {% if w.is_active %}<span class="badge badge-active">Active</span>
+                                    {% else %}<span class="badge badge-inactive">Inactive</span>{% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_scraper.toggle_website', id=w.id) }}" class="btn btn-sm btn-outline-{{ 'warning' if w.is_active else 'success' }}" title="Toggle">{% if w.is_active %}⏸{% else %}▶{% endif %}</a>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteWebsite({{ w.id }})"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="7" class="text-center text-muted py-4">No websites added yet</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    function deleteWebsite(id) {
+        if (confirm('Delete this website?')) {
+            fetch('/admin/website/delete/' + id, { method: 'POST' })
+                .then(r => r.json())
+                .then(d => { if (d.success) location.reload(); else alert('Error'); });
+        }
+    }
+</script>
+{% endblock %}

@@ -1,13 +1,10 @@
-# models.py
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import time
-from functools import wraps
+
 db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'user'
-    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     mobile = db.Column(db.String(20), unique=True, nullable=False)
@@ -34,45 +31,16 @@ class User(db.Model):
     user_type = db.Column(db.String(20), default='jobseeker')
     company_name = db.Column(db.String(200), default='')
     company_website = db.Column(db.String(200), default='')
+    show_email = db.Column(db.Boolean, default=False)
+    show_mobile = db.Column(db.Boolean, default=False)
     email_verified = db.Column(db.Boolean, default=False)
     mobile_verified = db.Column(db.Boolean, default=False)
     profile_complete = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_url = db.Column(db.String(200), default='')
-    show_email = db.Column(db.Boolean, default=False) 
-    show_mobile = db.Column(db.Boolean, default=False) 
-# models.py में जोड़ें
-class Admin(db.Model):
-    __tablename__ = 'admin'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    name = db.Column(db.String(100), default='Admin')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-# models.py में जोड़ें
 
-class Donation(db.Model):
-    __tablename__ = 'donation'
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    donor_name = db.Column(db.String(100))
-    donor_email = db.Column(db.String(120))
-    donor_mobile = db.Column(db.String(20))
-    amount = db.Column(db.Float, nullable=False)
-    currency = db.Column(db.String(10), default='INR')
-    payment_id = db.Column(db.String(100))  # Razorpay payment ID
-    order_id = db.Column(db.String(100))    # Razorpay order ID
-    status = db.Column(db.String(20), default='pending')  # pending, success, failed
-    payment_method = db.Column(db.String(50))  # UPI, Card, NetBanking, etc.
-    message = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationship
-    user = db.relationship('User', backref='donations')
 class Job(db.Model):
     __tablename__ = 'job'
-    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     employer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     title = db.Column(db.String(200), nullable=False)
@@ -84,7 +52,7 @@ class Job(db.Model):
     description = db.Column(db.Text, default='')
     requirements = db.Column(db.Text, default='')
     skills_required = db.Column(db.Text, default='')
-    apply_method = db.Column(db.String(50), default='email')
+    apply_method = db.Column(db.String(50), default='website')
     apply_email = db.Column(db.String(200), default='')
     apply_website = db.Column(db.String(500), default='')
     source = db.Column(db.String(50), default='user')
@@ -93,18 +61,64 @@ class Job(db.Model):
     posted_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
     views = db.Column(db.Integer, default=0)
-def retry_on_lock(max_retries=5, delay=0.5):
-    """Database lock होने पर रिट्राई करें"""
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            for attempt in range(max_retries):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    if 'database is locked' in str(e) and attempt < max_retries - 1:
-                        time.sleep(delay * (attempt + 1))
-                        continue
-                    raise e
-        return wrapper
-    return decorator
+
+class Donation(db.Model):
+    __tablename__ = 'donation'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    donor_name = db.Column(db.String(100))
+    donor_email = db.Column(db.String(120))
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    payment_method = db.Column(db.String(50))
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ScrapeWebsite(db.Model):
+    __tablename__ = 'scrape_website'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    base_url = db.Column(db.String(500), nullable=False)
+    card_selectors = db.Column(db.Text, default='[]')
+    title_selectors = db.Column(db.Text, default='[]')
+    company_selectors = db.Column(db.Text, default='[]')
+    location_selectors = db.Column(db.Text, default='[]')
+    link_selector = db.Column(db.String(200), default='a')
+    is_static_url = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    last_scraped = db.Column(db.DateTime, nullable=True)
+    jobs_found = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ScrapeKeyword(db.Model):
+    __tablename__ = 'scrape_keyword'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category = db.Column(db.String(100), default='general')
+    keyword = db.Column(db.String(200), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class ScrapeLocation(db.Model):
+    __tablename__ = 'scrape_location'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    location = db.Column(db.String(200), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Admin(db.Model):
+    __tablename__ = 'admin'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(100), default='Admin')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class ScrapeDesignation(db.Model):
+    __tablename__ = 'scrape_designation'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    designation = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), default='')
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

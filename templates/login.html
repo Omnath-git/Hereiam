@@ -1,158 +1,410 @@
 {% extends "base.html" %}
 
-{% block title %}Login - Professionals Data Bank{% endblock %}
+{% block title %}Login - Here I Am{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 0;
+    }
+    
+    .login-card {
+        background: white;
+        border-radius: 20px;
+        padding: 36px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #f1f5f9;
+        max-width: 440px;
+        width: 100%;
+    }
+    
+    .login-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.8rem;
+        color: #6366f1;
+    }
+    
+    .login-card h2 {
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    
+    .login-card .subtitle {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.88rem;
+        margin-bottom: 24px;
+    }
+    
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: #374151;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .input-group {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .input-group-text {
+        background: #f8fafc;
+        border: 2px solid #e5e7eb;
+        border-right: none;
+        color: #64748b;
+        padding: 10px 14px;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1e293b;
+        transition: all 0.3s;
+        background: #fafafa;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+        background: white;
+    }
+    
+    /* ⭐ Password Toggle Button */
+    .toggle-password-btn {
+        background: #f8fafc;
+        border: 2px solid #e5e7eb;
+        border-left: none;
+        color: #64748b;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+    }
+    
+    .toggle-password-btn:hover {
+        color: #6366f1;
+        background: #eef2ff;
+    }
+    
+    .toggle-password-btn i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+    
+    /* Remember Me & Forgot Password Row */
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .form-check {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .form-check-input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        cursor: pointer;
+        accent-color: #6366f1;
+    }
+    
+    .form-check-label {
+        font-size: 0.82rem;
+        color: #64748b;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    
+    .forgot-link {
+        font-size: 0.82rem;
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    
+    .forgot-link:hover {
+        color: #4f46e5;
+        text-decoration: underline;
+    }
+    
+    /* Buttons */
+    .btn-login {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-login:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99,102,241,0.3);
+    }
+    
+    .btn-login:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Divider */
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+    }
+    
+    .divider span {
+        font-size: 0.78rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+    
+    /* Register Link */
+    .register-link {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #f1f5f9;
+    }
+    
+    .register-link p {
+        color: #64748b;
+        font-size: 0.88rem;
+        margin: 0;
+    }
+    
+    .register-link a {
+        color: #6366f1;
+        font-weight: 700;
+        text-decoration: none;
+    }
+    
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+    
+    .btn-register-link {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-top: 8px;
+        background: transparent;
+        color: #6366f1;
+        border: 2px solid #6366f1;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-register-link:hover {
+        background: #eef2ff;
+        color: #4f46e5;
+    }
+    
+    /* Error state */
+    .form-control.error {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 4px rgba(239,68,68,0.1);
+    }
+    
+    .error-message {
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 4px;
+        display: none;
+    }
+    
+    .error-message.show {
+        display: block;
+    }
+    
+    /* Loading overlay */
+    .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .loading-overlay.show {
+        display: flex;
+    }
+    
+    /* Responsive */
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 24px 16px;
+            border-radius: 16px;
+        }
+        .form-row {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="text-center mb-4">
-                <i class="fas fa-database fa-3x" style="color: var(--primary);"></i>
-                <h2 class="mt-3 fw-bold" style="color: var(--secondary);">Welcome Back!</h2>
-                <p class="text-muted">Login to access your professional dashboard</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-body p-4">
-                    <h4 class="text-center mb-4">
-                        <i class="fas fa-sign-in-alt me-2" style="color: var(--primary);"></i>
-                        Login to Your Account
-                    </h4>
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-sm-8">
+                
+                <div class="login-card">
+                    <!-- Icon -->
+                    <div class="login-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
                     
-                    <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-envelope me-2"></i>Email Address
+                    <h2>Welcome Back</h2>
+                    <p class="subtitle">Login to access your dashboard</p>
+                    
+                    <!-- Login Form -->
+                    <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" novalidate>
+                        
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-envelope me-1"></i> Email Address
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text" style="background: var(--gradient); color: white; border: none;">
+                                <span class="input-group-text">
                                     <i class="fas fa-envelope"></i>
                                 </span>
                                 <input type="email" 
                                        name="email" 
                                        class="form-control" 
-                                       placeholder="Enter your email"
+                                       id="emailInput"
+                                       placeholder="your@email.com"
                                        value="{{ request.form.get('email', '') }}"
                                        required 
-                                       autocomplete="email">
+                                       autocomplete="email"
+                                       autofocus>
                             </div>
-                            <div class="form-text">Use your registered email address</div>
+                            <div class="error-message" id="emailError">Please enter a valid email address</div>
                         </div>
                         
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-lock me-2"></i>Password
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-lock me-1"></i> Password
                             </label>
                             <div class="input-group">
-                                <span class="input-group-text" style="background: var(--gradient); color: white; border: none;">
+                                <span class="input-group-text">
                                     <i class="fas fa-lock"></i>
                                 </span>
                                 <input type="password" 
                                        name="password" 
                                        class="form-control" 
+                                       id="passwordInput"
                                        placeholder="Enter your password"
                                        required 
-                                       autocomplete="current-password"
-                                       id="passwordField">
-                                <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword()">
+                                       autocomplete="current-password">
+                                <!-- ⭐ FIXED: Password Toggle Button -->
+                                <button type="button" class="toggle-password-btn" id="togglePasswordBtn" tabindex="-1">
                                     <i class="fas fa-eye" id="toggleIcon"></i>
-                                </span>
+                                </button>
                             </div>
-                            <div class="form-text">Password is case sensitive</div>
+                            <div class="error-message" id="passwordError">Password must be at least 6 characters</div>
                         </div>
                         
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
-                            <label class="form-check-label" for="rememberMe">Remember me</label>
-                        </div>
-                        <div class="mb-3 text-end">
-    <a href="{{ url_for('auth.forgot_password') }}" class="text-muted small">
-        <i class="fas fa-question-circle me-1"></i>Forgot Password?
-    </a>
-</div>
-                        <button type="submit" class="btn btn-primary w-100 mb-3">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </button>
-                        
-                        <!-- <div class="text-center mb-3">
-                            <a href="#" class="text-muted small" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">
+                        <!-- Remember Me + Forgot Password -->
+                        <div class="form-row">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" name="remember">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">
                                 <i class="fas fa-question-circle me-1"></i>Forgot Password?
                             </a>
-                        </div> -->
-                        
-                        <hr>
-                        
-                        <div class="text-center">
-                            <p class="text-muted mb-0">Don't have an account?</p>
-                            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary mt-2 w-100">
-                                <i class="fas fa-user-plus me-2"></i>Create New Account
-                            </a>
                         </div>
+                        
+                        <!-- Login Button -->
+                        <button type="submit" class="btn-login" id="loginBtn">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </button>
                     </form>
-                </div>
-            </div>
-            
-            <!-- Quick Info Cards -->
-            <div class="row mt-4">
-                <div class="col-6">
-                    <div class="card bg-light">
-                        <div class="card-body text-center p-3">
-                            <i class="fas fa-shield-alt fa-2x mb-2" style="color: var(--accent);"></i>
-                            <h6 class="mb-0">Secure Login</h6>
-                            <small class="text-muted">256-bit encryption</small>
-                        </div>
+                    
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>New to Here I Am?</span>
+                    </div>
+                    
+                    <!-- Register Link -->
+                    <div class="register-link">
+                        <a href="{{ url_for('auth.register') }}" class="btn-register-link">
+                            <i class="fas fa-user-plus me-2"></i>Create Free Account
+                        </a>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="card bg-light">
-                        <div class="card-body text-center p-3">
-                            <i class="fas fa-clock fa-2x mb-2" style="color: var(--primary);"></i>
-                            <h6 class="mb-0">Quick Access</h6>
-                            <small class="text-muted">One-click login</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Forgot Password Modal -->
-<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background: var(--gradient); color: white;">
-                <h5 class="modal-title" id="forgotPasswordModalLabel">
-                    <i class="fas fa-key me-2"></i>Reset Password
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted">Enter your registered email address and we'll send you instructions to reset your password.</p>
-                <form id="forgotPasswordForm">
-                    <div class="mb-3">
-                        <label class="form-label">Email Address</label>
-                        <input type="email" class="form-control" placeholder="Enter your email" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-paper-plane me-2"></i>Send Reset Link
-                    </button>
-                </form>
-                <div id="resetMessage" class="mt-3" style="display: none;"></div>
+                
             </div>
         </div>
     </div>
 </div>
 
 <!-- Loading Overlay -->
-<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999;">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-center">
-            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <h4 class="text-white mt-3">Logging in...</h4>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Logging in...</span>
         </div>
+        <h4 class="text-white mt-3">Logging in...</h4>
     </div>
 </div>
 
@@ -160,233 +412,137 @@
 
 {% block extra_js %}
 <script>
-// Toggle Password Visibility
-function togglePassword() {
-    const passwordField = document.getElementById('passwordField');
-    const toggleIcon = document.getElementById('toggleIcon');
+    // ============================================================
+    // ⭐ PASSWORD TOGGLE - FIXED
+    // ============================================================
+    var togglePasswordBtn = document.getElementById('togglePasswordBtn');
+    var passwordInput = document.getElementById('passwordInput');
+    var toggleIcon = document.getElementById('toggleIcon');
     
-    if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        toggleIcon.classList.remove('fa-eye');
-        toggleIcon.classList.add('fa-eye-slash');
-    } else {
-        passwordField.type = 'password';
-        toggleIcon.classList.remove('fa-eye-slash');
-        toggleIcon.classList.add('fa-eye');
-    }
-}
-
-// Form Validation
-document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const email = this.querySelector('[name="email"]').value.trim();
-    const password = this.querySelector('[name="password"]').value;
-    
-    // Basic validation
-    if (!email) {
-        showAlert('Please enter your email address', 'warning');
-        return;
+    if (togglePasswordBtn && passwordInput && toggleIcon) {
+        togglePasswordBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+                togglePasswordBtn.style.color = '#6366f1';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+                togglePasswordBtn.style.color = '#64748b';
+            }
+        });
     }
     
-    if (!isValidEmail(email)) {
-        showAlert('Please enter a valid email address', 'warning');
-        return;
+    // ============================================================
+    // FORM VALIDATION
+    // ============================================================
+    var loginForm = document.getElementById('loginForm');
+    var emailInput = document.getElementById('emailInput');
+    
+    function showError(inputId, errorId) {
+        document.getElementById(inputId).classList.add('error');
+        document.getElementById(errorId).classList.add('show');
     }
     
-    if (!password) {
-        showAlert('Please enter your password', 'warning');
-        return;
+    function hideError(inputId, errorId) {
+        document.getElementById(inputId).classList.remove('error');
+        document.getElementById(errorId).classList.remove('show');
     }
     
-    if (password.length < 6) {
-        showAlert('Password must be at least 6 characters', 'warning');
-        return;
-    }
-    
-    // Show loading
-    showLoading(true);
-    
-    // Submit the form
-    this.submit();
-});
-
-// Forgot Password Form
-document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const email = this.querySelector('[type="email"]').value.trim();
-    
-    if (!email || !isValidEmail(email)) {
-        showResetMessage('Please enter a valid email address', 'danger');
-        return;
-    }
-    
-    // Show sending state
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
-    submitBtn.disabled = true;
-    
-    // Simulate sending (replace with actual API call)
-    setTimeout(() => {
-        showResetMessage('Password reset link has been sent to your email!', 'success');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-        // Close modal after 2 seconds
-        setTimeout(() => {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
-            modal.hide();
-        }, 2000);
-    }, 1500);
-});
-
-// Helper Functions
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function showAlert(message, type) {
-    // Remove existing alerts
-    const existingAlert = document.querySelector('.custom-alert');
-    if (existingAlert) {
-        existingAlert.remove();
-    }
-    
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show custom-alert`;
-    alertDiv.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(alertDiv);
-    
-    // Auto dismiss after 3 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.remove();
+    // Real-time validation
+    emailInput.addEventListener('input', function() {
+        if (isValidEmail(this.value)) {
+            hideError('emailInput', 'emailError');
         }
-    }, 3000);
-}
-
-function showResetMessage(message, type) {
-    const messageDiv = document.getElementById('resetMessage');
-    messageDiv.style.display = 'block';
-    messageDiv.className = `alert alert-${type} mt-3`;
-    messageDiv.textContent = message;
-}
-
-function showLoading(show) {
-    const overlay = document.getElementById('loadingOverlay');
-    overlay.style.display = show ? 'block' : 'none';
-}
-
-// Auto-focus on email field
-document.addEventListener('DOMContentLoaded', function() {
-    const emailField = document.querySelector('[name="email"]');
-    if (emailField) {
-        emailField.focus();
-    }
-    
-    // Check for flash messages
-    const flashMessages = document.querySelectorAll('.alert');
-    flashMessages.forEach(msg => {
-        setTimeout(() => {
-            msg.style.transition = 'opacity 0.5s';
-            msg.style.opacity = '0';
-            setTimeout(() => msg.remove(), 500);
-        }, 5000);
     });
-});
-
-// Keyboard shortcut for login (Ctrl+Enter)
-document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm && document.activeElement && document.activeElement.closest('#loginForm')) {
-            loginForm.dispatchEvent(new Event('submit'));
+    
+    passwordInput.addEventListener('input', function() {
+        if (this.value.length >= 6) {
+            hideError('passwordInput', 'passwordError');
         }
-    }
-});
-</script>
-
-<style>
-/* Additional styles for login page */
-.card {
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: all 0.3s;
-}
-
-.card:hover {
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-}
-
-.form-control:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
-}
-
-.input-group-text {
-    border: 1px solid #dee2e6;
-}
-
-.btn-primary {
-    background: var(--gradient);
-    border: none;
-    padding: 12px;
-    border-radius: 25px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(108, 99, 255, 0.4);
-}
-
-.btn-outline-primary {
-    border: 2px solid var(--primary);
-    color: var(--primary);
-    border-radius: 25px;
-    padding: 10px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-outline-primary:hover {
-    background: var(--gradient);
-    border-color: transparent;
-    color: white;
-    transform: translateY(-2px);
-}
-
-.form-check-input:checked {
-    background-color: var(--primary);
-    border-color: var(--primary);
-}
-
-.modal-content {
-    border: none;
-    border-radius: 15px;
-    overflow: hidden;
-}
-
-/* Responsive adjustments */
-@media (max-width: 576px) {
-    .container {
-        padding: 10px;
+    });
+    
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var email = emailInput.value.trim();
+        var password = passwordInput.value;
+        var isValid = true;
+        
+        // Validate email
+        if (!email) {
+            showError('emailInput', 'emailError');
+            isValid = false;
+        } else if (!isValidEmail(email)) {
+            showError('emailInput', 'emailError');
+            isValid = false;
+        } else {
+            hideError('emailInput', 'emailError');
+        }
+        
+        // Validate password
+        if (!password) {
+            showError('passwordInput', 'passwordError');
+            isValid = false;
+        } else if (password.length < 6) {
+            showError('passwordInput', 'passwordError');
+            isValid = false;
+        } else {
+            hideError('passwordInput', 'passwordError');
+        }
+        
+        if (!isValid) {
+            // Scroll to first error
+            var firstError = document.querySelector('.form-control.error');
+            if (firstError) {
+                firstError.focus();
+            }
+            return;
+        }
+        
+        // Show loading
+        var loadingOverlay = document.getElementById('loadingOverlay');
+        loadingOverlay.classList.add('show');
+        
+        var loginBtn = document.getElementById('loginBtn');
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+        
+        // Submit form
+        this.submit();
+    });
+    
+    // ============================================================
+    // HELPER FUNCTIONS
+    // ============================================================
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
     
-    .card {
-        margin: 0 -10px;
-        border-radius: 10px;
-    }
-}
-</style>
+    // ============================================================
+    // KEYBOARD SHORTCUT - Ctrl+Enter to login
+    // ============================================================
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            if (document.activeElement && document.activeElement.closest('#loginForm')) {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+    
+    // ============================================================
+    // INITIALIZE
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-focus on email field
+        if (emailInput && !emailInput.value) {
+            emailInput.focus();
+        }
+    });
+</script>
 {% endblock %}
