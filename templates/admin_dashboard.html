@@ -1,46 +1,82 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - Professionals Data Bank{% endblock %}
+{% block title %}Admin Dashboard - Here I Am{% endblock %}
 
 {% block extra_css %}
 <style>
     .admin-container { padding: 30px 0; }
     .admin-header {
         background: linear-gradient(135deg, #1e293b, #334155);
-        border-radius: 20px;
-        padding: 30px;
-        color: white;
-        margin-bottom: 24px;
+        border-radius: 20px; padding: 24px 30px;
+        color: white; margin-bottom: 24px;
     }
-    .admin-header h1 { font-family: 'Playfair Display', serif; font-weight: 800; margin: 0; }
-    .admin-header p { opacity: 0.7; margin: 4px 0 0; }
+    .admin-header h1 { font-family: 'Playfair Display', serif; font-weight: 800; margin: 0; font-size: 1.8rem; }
+    .admin-header p { opacity: 0.7; margin: 4px 0 0; font-size: 0.9rem; }
     
     .stat-card {
-        background: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.06);
-        text-align: center;
-        transition: all 0.3s;
-        margin-bottom: 16px;
+        background: white; border-radius: 16px; padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06); text-align: center;
+        transition: all 0.3s; margin-bottom: 16px;
     }
     .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
     .stat-card .stat-number { font-size: 2rem; font-weight: 800; }
-    .stat-card .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-card .stat-label { font-size: 0.72rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
     
     .stat-card.purple .stat-number { color: #8b5cf6; }
     .stat-card.green .stat-number { color: #10b981; }
     .stat-card.blue .stat-number { color: #3b82f6; }
     .stat-card.orange .stat-number { color: #f59e0b; }
     .stat-card.red .stat-number { color: #ef4444; }
+    .stat-card.pink .stat-number { color: #ec4899; }
     
-    .nav-pills .nav-link {
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-weight: 600;
-        font-size: 0.85rem;
+    .admin-nav-card {
+        background: white; border-radius: 16px; padding: 24px 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06); text-align: center;
+        transition: all 0.3s; text-decoration: none; color: #1e293b;
+        display: block; height: 100%; border: none; cursor: pointer; width: 100%;
     }
-    .nav-pills .nav-link.active { background: #8b5cf6; }
+    .admin-nav-card:hover {
+        transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1);
+    }
+    .admin-nav-card .nav-icon { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+    .admin-nav-card h6 { font-weight: 700; margin: 0 0 4px; font-size: 0.95rem; }
+    .admin-nav-card small { color: #64748b; font-size: 0.75rem; }
+    
+    /* Scraping Control Card */
+    .scrape-control-card {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-radius: 16px; padding: 24px;
+        color: white; margin-bottom: 20px;
+    }
+    .scrape-control-card h5 { font-weight: 700; margin-bottom: 4px; }
+    .scrape-control-card p { opacity: 0.7; font-size: 0.85rem; margin: 0; }
+    
+    .btn-scrape-full {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white; border: none; padding: 12px 24px;
+        border-radius: 12px; font-weight: 700; font-size: 0.9rem;
+        transition: all 0.3s; cursor: pointer;
+    }
+    .btn-scrape-full:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
+    
+    .btn-scrape-light {
+        background: white; color: #f59e0b; border: 2px solid #f59e0b;
+        padding: 12px 24px; border-radius: 12px; font-weight: 700;
+        font-size: 0.9rem; cursor: pointer; transition: all 0.3s;
+    }
+    .btn-scrape-light:hover:not(:disabled) { background: #fef3c7; }
+    
+    .scrape-status {
+        display: inline-block; padding: 6px 14px; border-radius: 50px;
+        font-weight: 600; font-size: 0.78rem;
+    }
+    .status-running { background: #fef3c7; color: #92400e; animation: pulse 1.5s infinite; }
+    .status-idle { background: #d1fae5; color: #065f46; }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
     
     .table td { vertical-align: middle; font-size: 0.85rem; }
     .btn-delete { padding: 4px 10px; font-size: 0.7rem; }
@@ -53,21 +89,43 @@
         
         <!-- Header -->
         <div class="admin-header">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
                     <h1><i class="fas fa-crown me-2"></i>Admin Dashboard</h1>
-                    <p>Manage users, jobs, and view reports</p>
+                    <p>Manage users, jobs, scraper settings, and donations</p>
                 </div>
                 <div>
-                    <a href="{{ url_for('admin.admin_reports') }}" class="btn btn-light me-2">
-                        <i class="fas fa-chart-bar me-1"></i>Reports
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-home me-1"></i>Site Home
                     </a>
-                    <a href="{{ url_for('admin_scraper.manage_websites') }}" class="btn btn-outline-light btn-sm">
-                        <i class="fas fa-globe me-1"></i> Scraper Settings
-                    </a>
-                    <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-outline-light">
+                    <a href="{{ url_for('admin.admin_logout') }}" class="btn btn-light btn-sm">
                         <i class="fas fa-sign-out-alt me-1"></i>Logout
                     </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ⭐ SCRAPING CONTROL PANEL -->
+        <div class="scrape-control-card">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-spider me-2"></i>Job Scraping Control</h5>
+                    <p>Start or stop job scraping from multiple websites</p>
+                    <div class="mt-2">
+                        <span class="scrape-status" id="scrapeStatus">
+                            <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>
+                            Checking...
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end mt-3 mt-md-0">
+                    <button class="btn-scrape-light me-2" id="btnLightScrape" onclick="startLightScrape()">
+                        <i class="fas fa-bolt me-1"></i> Quick Scrape
+                    </button>
+                    <button class="btn-scrape-full" id="btnFullScrape" onclick="startFullScrape()">
+                        <i class="fas fa-rocket me-1"></i> Full Scrape
+                    </button>
+                    <div id="scrapeProgress" class="mt-2 text-white-50 small" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -76,7 +134,7 @@
         <div class="row">
             <div class="col-xl-2 col-md-4 col-6">
                 <div class="stat-card purple">
-                    <div class="stat-number">{{ total_users }}</div>
+                    <div class="stat-number" id="totalUsers">{{ total_users }}</div>
                     <div class="stat-label">Total Users</div>
                 </div>
             </div>
@@ -94,83 +152,73 @@
             </div>
             <div class="col-xl-2 col-md-4 col-6">
                 <div class="stat-card orange">
-                    <div class="stat-number">{{ total_jobs }}</div>
+                    <div class="stat-number" id="totalJobs">{{ total_jobs }}</div>
                     <div class="stat-label">Total Jobs</div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-4 col-6">
                 <div class="stat-card green">
-                    <div class="stat-number">{{ active_jobs }}</div>
+                    <div class="stat-number" id="activeJobs">{{ active_jobs }}</div>
                     <div class="stat-label">Active Jobs</div>
                 </div>
             </div>
             <div class="col-xl-2 col-md-4 col-6">
-                <div class="stat-card red">
-                    <div class="stat-number">{{ scraped_jobs }}</div>
-                    <div class="stat-label">Scraped Jobs</div>
+                <div class="stat-card pink">
+                    <div class="stat-number">₹{{ total_donations|default(0)|int }}</div>
+                    <div class="stat-label">Donations</div>
                 </div>
             </div>
         </div>
         
-        <!-- Quick Navigation -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <ul class="nav nav-pills">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('admin.admin_users') }}">
-                            <i class="fas fa-users me-1"></i>Manage Users
-                        </a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link" href="{{ url_for('admin.admin_jobs') }}">
-                            <i class="fas fa-briefcase me-1"></i>Manage Jobs
-                        </a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link" href="{{ url_for('admin.admin_reports') }}">
-                            <i class="fas fa-chart-pie me-1"></i>View Reports
-                        </a>
-                    </li>
-                </ul>
+        <!-- Navigation Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.admin_users') }}" class="admin-nav-card">
+                    <span class="nav-icon" style="color:#8b5cf6;"><i class="fas fa-users"></i></span>
+                    <h6>Manage Users</h6><small>View, search & delete</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.admin_jobs') }}" class="admin-nav-card">
+                    <span class="nav-icon" style="color:#10b981;"><i class="fas fa-briefcase"></i></span>
+                    <h6>Manage Jobs</h6><small>View, search & delete</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin_scraper.manage_websites') }}" class="admin-nav-card">
+                    <span class="nav-icon" style="color:#3b82f6;"><i class="fas fa-globe"></i></span>
+                    <h6>Scraper Settings</h6><small>Websites, keywords</small>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="{{ url_for('admin.admin_donations') }}" class="admin-nav-card">
+                    <span class="nav-icon" style="color:#f59e0b;"><i class="fas fa-hand-holding-heart"></i></span>
+                    <h6>Donations</h6><small>View records</small>
+                </a>
             </div>
         </div>
         
         <!-- Recent Users -->
         <div class="card mb-3">
-            <div class="card-header fw-bold">
-                <i class="fas fa-users me-2"></i>Recent Users
-                <a href="{{ url_for('admin.admin_users') }}" class="btn btn-sm btn-outline-primary float-end">View All</a>
+            <div class="card-header fw-bold d-flex justify-content-between">
+                <span><i class="fas fa-users me-2"></i>Recent Users</span>
+                <a href="{{ url_for('admin.admin_users') }}" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
-                            <tr>
-                                <th>Name</th><th>Email</th><th>Domain</th><th>Type</th><th>Joined</th><th>Action</th>
-                            </tr>
+                            <tr><th>Name</th><th>Email</th><th>Domain</th><th>Type</th><th>Joined</th><th></th></tr>
                         </thead>
                         <tbody>
                             {% for user in recent_users %}
                             <tr>
                                 <td class="fw-bold">{{ user.full_name[:30] }}</td>
-                                <td>{{ user.email[:25] }}</td>
+                                <td>{{ user.email[:30] }}</td>
                                 <td>{{ user.domain[:20] }}</td>
-                                <td>
-                                    {% if user.user_type == 'employer' %}
-                                    <span class="badge bg-success">Employer</span>
-                                    {% else %}
-                                    <span class="badge bg-primary">Professional</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ user.created_at.strftime('%d %b') if user.created_at else '-' }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger btn-delete" 
-                                            data-action="delete-user"
-                                            data-user-id="{{ user.id }}"
-                                            data-user-name="{{ user.full_name }}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
+                                <td>{% if user.user_type == 'employer' %}<span class="badge bg-success">Employer</span>{% else %}<span class="badge bg-primary">Pro</span>{% endif %}</td>
+                                <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else '-' }}</td>
+                                <td><button class="btn btn-sm btn-outline-danger btn-delete" onclick="deleteUser({{ user.id }}, '{{ user.full_name|e }}')"><i class="fas fa-trash"></i></button></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -181,17 +229,15 @@
         
         <!-- Recent Jobs -->
         <div class="card">
-            <div class="card-header fw-bold">
-                <i class="fas fa-briefcase me-2"></i>Recent Jobs
-                <a href="{{ url_for('admin.admin_jobs') }}" class="btn btn-sm btn-outline-primary float-end">View All</a>
+            <div class="card-header fw-bold d-flex justify-content-between">
+                <span><i class="fas fa-briefcase me-2"></i>Recent Jobs</span>
+                <a href="{{ url_for('admin.admin_jobs') }}" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
-                            <tr>
-                                <th>Title</th><th>Company</th><th>Location</th><th>Source</th><th>Posted</th><th>Action</th>
-                            </tr>
+                            <tr><th>Title</th><th>Company</th><th>Location</th><th>Source</th><th>Posted</th><th></th></tr>
                         </thead>
                         <tbody>
                             {% for job in recent_jobs %}
@@ -199,22 +245,9 @@
                                 <td class="fw-bold">{{ job.title[:40] }}</td>
                                 <td>{{ job.company[:25] }}</td>
                                 <td>{{ job.location[:20] }}</td>
-                                <td>
-                                    {% if job.source == 'scraped' %}
-                                    <span class="badge bg-info">Scraped</span>
-                                    {% else %}
-                                    <span class="badge bg-warning">User</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ job.posted_date.strftime('%d %b') if job.posted_date else '-' }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-danger btn-delete" 
-                                            data-action="delete-job"
-                                            data-job-id="{{ job.id }}"
-                                            data-job-title="{{ job.title[:40] }}">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
+                                <td>{% if job.source == 'scraped' %}<span class="badge bg-info">Scraped</span>{% else %}<span class="badge bg-warning text-dark">User</span>{% endif %}</td>
+                                <td>{{ job.posted_date.strftime('%d %b %Y') if job.posted_date else '-' }}</td>
+                                <td><button class="btn btn-sm btn-outline-danger btn-delete" onclick="deleteJob({{ job.id }}, '{{ job.title[:40]|e }}')"><i class="fas fa-trash"></i></button></td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -227,43 +260,104 @@
 </div>
 
 <script>
+    // ⭐ SCRAPING FUNCTIONS
+    let scrapeInterval = null;
+    
+    function checkScrapeStatus() {
+        fetch('/api/scrape-status')
+            .then(r => r.json())
+            .then(data => {
+                const statusEl = document.getElementById('scrapeStatus');
+                if (data.running) {
+                    statusEl.className = 'scrape-status status-running';
+                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Running: ' + data.current;
+                    document.getElementById('scrapeProgress').style.display = 'block';
+                    document.getElementById('scrapeProgress').textContent = 'Progress: ' + data.progress + ' | Scraped today: ' + (data.added_today || data.total_jobs || '...');
+                } else {
+                    statusEl.className = 'scrape-status status-idle';
+                    statusEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Idle | ' + data.total_jobs + ' scraped jobs in DB';
+                    document.getElementById('scrapeProgress').style.display = 'none';
+                }
+                // Update stats
+                document.getElementById('totalJobs').textContent = data.total_jobs || '0';
+                document.getElementById('activeJobs').textContent = data.total_jobs || '0';
+            })
+            .catch(() => {
+                document.getElementById('scrapeStatus').className = 'scrape-status status-idle';
+                document.getElementById('scrapeStatus').innerHTML = '<i class="fas fa-check-circle me-1"></i> Status unavailable';
+            });
+    }
+    
+    function startFullScrape() {
+        const btn = document.getElementById('btnFullScrape');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
+        
+        fetch('/scrape-jobs-now')
+            .then(() => {
+                btn.innerHTML = '<i class="fas fa-check me-1"></i> Started!';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-rocket me-1"></i> Full Scrape';
+                }, 3000);
+                checkScrapeStatus();
+                if (scrapeInterval) clearInterval(scrapeInterval);
+                scrapeInterval = setInterval(checkScrapeStatus, 5000);
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket me-1"></i> Full Scrape';
+                alert('Failed to start scraping');
+            });
+    }
+    
+    function startLightScrape() {
+        const btn = document.getElementById('btnLightScrape');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
+        
+        fetch('/scrape-light')
+            .then(() => {
+                btn.innerHTML = '<i class="fas fa-check me-1"></i> Started!';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Quick Scrape';
+                }, 3000);
+                checkScrapeStatus();
+                if (scrapeInterval) clearInterval(scrapeInterval);
+                scrapeInterval = setInterval(checkScrapeStatus, 5000);
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Quick Scrape';
+                alert('Failed to start scraping');
+            });
+    }
+    
+    // Delete functions
     function deleteUser(id, name) {
-        if (confirm(`Delete user "${name}"?\\nThis action cannot be undone!`)) {
-            fetch(`/admin/delete-user/${id}`, { method: 'POST' })
+        if (confirm('Delete "' + name + '"?\nThis cannot be undone!')) {
+            fetch('/admin/delete-user/' + id, { method: 'POST' })
                 .then(r => r.json())
-                .then(data => {
-                    if (data.success) { alert('✅ User deleted!'); location.reload(); }
-                    else { alert('❌ ' + data.message); }
-                });
+                .then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
         }
     }
     
     function deleteJob(id, title) {
-        if (confirm(`Delete job "${title}"?\\nThis action cannot be undone!`)) {
-            fetch(`/admin/delete-job/${id}`, { method: 'POST' })
+        if (confirm('Delete "' + title + '"?\nThis cannot be undone!')) {
+            fetch('/admin/delete-job/' + id, { method: 'POST' })
                 .then(r => r.json())
-                .then(data => {
-                    if (data.success) { alert('✅ Job deleted!'); location.reload(); }
-                    else { alert('❌ ' + data.message); }
-                });
+                .then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
         }
     }
     
-    // Event listeners for delete buttons
-    document.querySelectorAll('[data-action="delete-user"]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const userId = this.getAttribute('data-user-id');
-            const userName = this.getAttribute('data-user-name');
-            deleteUser(userId, userName);
-        });
-    });
-    
-    document.querySelectorAll('[data-action="delete-job"]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const jobId = this.getAttribute('data-job-id');
-            const jobTitle = this.getAttribute('data-job-title');
-            deleteJob(jobId, jobTitle);
-        });
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        checkScrapeStatus();
+        // Check status every 30 seconds if not already checking
+        setInterval(function() {
+            if (!scrapeInterval) checkScrapeStatus();
+        }, 30000);
     });
 </script>
 {% endblock %}
