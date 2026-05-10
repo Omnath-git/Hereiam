@@ -98,6 +98,8 @@ def register():
 # VERIFY OTP
 # ============================================================
 
+# blueprints/auth.py
+
 @auth_bp.route('/verify-otp', methods=['POST'])
 def verify_otp():
     email = request.form.get('email', '').strip().lower()
@@ -112,33 +114,26 @@ def verify_otp():
         flash('OTP expired or not found. Please register again.', 'error')
         return redirect(url_for('auth.register'))
     
-    # ⭐ Check attempts (max 5)
-    stored['attempts'] = stored.get('attempts', 0) + 1
-    if stored['attempts'] > 5:
-        del otp_storage[email]
-        flash('Too many attempts. Please register again.', 'error')
-        return redirect(url_for('auth.register'))
-    
-    # ⭐ Check expiry (30 minutes)
+    # ⭐ Expiry check
     if stored['expires'] < datetime.utcnow():
         del otp_storage[email]
-        flash('OTP expired! Please register again.', 'error')
+        flash('OTP has expired. Please register again to get a new OTP.', 'error')
         return redirect(url_for('auth.register'))
     
-    # ⭐ Compare OTP as strings (simple comparison)
-    stored_otp = str(stored['otp']).strip()
-    entered_otp = str(otp_entered).strip()
-    
-    if stored_otp != entered_otp:
-        remaining = 5 - stored['attempts']
-        if remaining <= 0:
-            del otp_storage[email]
-            flash('Too many attempts. Please register again.', 'error')
-            return redirect(url_for('auth.register'))
-        flash(f'Invalid OTP! {remaining} attempts remaining. OTP: {stored_otp} vs Entered: {entered_otp}', 'error')
+    # ⭐ OTP comparison
+    if str(stored['otp']).strip() != str(otp_entered).strip():
+        # ⭐ UNLIMITED ATTEMPTS - बस काउंट बढ़ाएं, ब्लॉक न करें
+        stored['attempts'] = stored.get('attempts', 0) + 1
+        
+        # ⭐ 3 गलत attempts के बाद resend का suggestion दें
+        if stored['attempts'] >= 3:
+            flash(f'Wrong OTP! Tried {stored["attempts"]} times. You can <a href="#" onclick="resendOTP()">resend OTP</a> or try again.', 'warning')
+        else:
+            flash(f'Invalid OTP! Please try again. ({stored["attempts"]} attempt)', 'error')
+        
         return render_template('verify_otp.html', email=email, mobile=mobile)
     
-    # ⭐ OTP सही है - यूजर बनाएं
+    # ✅ OTP सही है - यूजर बनाएं
     data = stored['data']
     
     user = User(
@@ -155,12 +150,13 @@ def verify_otp():
         show_email=data.get('show_email', False),
         show_mobile=data.get('show_mobile', False),
         email_verified=True,
-        mobile_verified=False,  # ⭐ Mobile verify नहीं
+        mobile_verified=False,
     )
     
     db.session.add(user)
     
-    # ⭐ Retry on database lock
+    # Retry on database lock
+    import time
     for attempt in range(5):
         try:
             db.session.commit()
@@ -183,7 +179,6 @@ def verify_otp():
     else:
         flash('Registration successful! Upload your CV to complete your profile.', 'success')
         return redirect(url_for('profile.upload_cv'))
-
 
 # ============================================================
 # RESEND OTP
