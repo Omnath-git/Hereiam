@@ -44,7 +44,7 @@ def create_app():
         print("✅ Databases created: main.db, jobs.db")
     
     # Start scraper
-    start_job_scraper(app)
+    #start_job_scraper(app)
     
     return app
 if __name__ == '__main__':
