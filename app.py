@@ -3,13 +3,15 @@ from config import Config
 from models import db
 import os
 
+# app.py
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
     db.init_app(app)
     
-    # Create directories
+    # ⭐ Create directories
     for folder in [app.config['UPLOAD_FOLDER'], app.config['CV_UPLOAD_FOLDER'], app.config['PROFILES_FOLDER']]:
         os.makedirs(folder, exist_ok=True)
     
@@ -23,9 +25,9 @@ def create_app():
     from blueprints.admin import admin_bp
     from blueprints.admin_scraper import admin_scraper_bp
     from blueprints.donate import donate_bp
-    from blueprints.seo import seo_bp
+    from blueprints.locations import locations_bp
     
-    app.register_blueprint(seo_bp)  
+    app.register_blueprint(locations_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
@@ -35,13 +37,16 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(admin_scraper_bp)
     app.register_blueprint(donate_bp)
-
-
+    
+    # ⭐ Create all databases
+    with app.app_context():
+        db.create_all()  # Creates main.db and jobs.db
+        print("✅ Databases created: main.db, jobs.db")
+    
     # Start scraper
     start_job_scraper(app)
     
     return app
-
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():

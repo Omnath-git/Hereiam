@@ -352,14 +352,18 @@
                             <!-- City & State -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">🏙️ City *</label>
-                                    <input type="text" name="city" class="form-control" placeholder="e.g., Mumbai" required id="city">
-                                    <div class="error-message" id="cityError">Please enter your city</div>
+                                    <label class="form-label">🗺️ State *</label>
+                                    <select name="state" class="form-control" id="stateSelect" required onchange="loadDistricts()">
+                                        <option value="">Select State</option>
+                                    </select>
+                                    <div class="error-message" id="stateError">Please select your state</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">🗺️ State *</label>
-                                    <input type="text" name="state" class="form-control" placeholder="e.g., Maharashtra" required id="state">
-                                    <div class="error-message" id="stateError">Please enter your state</div>
+                                    <label class="form-label">🏙️ District/City *</label>
+                                    <select name="city" class="form-control" id="citySelect" required>
+                                        <option value="">Select State First</option>
+                                    </select>
+                                    <div class="error-message" id="cityError">Please select your district/city</div>
                                 </div>
                             </div>
                             
@@ -446,6 +450,55 @@
 
 {% block extra_js %}
 <script>
+    // Load states on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStates();
+    });
+
+    function loadStates() {
+        fetch('/api/states')
+            .then(r => r.json())
+            .then(data => {
+                const stateSelect = document.getElementById('stateSelect');
+                data.states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateSelect.appendChild(option);
+                });
+            })
+            .catch(err => console.error('Error loading states:', err));
+    }
+
+    function loadDistricts() {
+        const state = document.getElementById('stateSelect').value;
+        const citySelect = document.getElementById('citySelect');
+        
+        // Reset city dropdown
+        citySelect.innerHTML = '<option value="">Loading...</option>';
+        
+        if (!state) {
+            citySelect.innerHTML = '<option value="">Select State First</option>';
+            return;
+        }
+        
+        fetch('/api/districts/' + encodeURIComponent(state))
+            .then(r => r.json())
+            .then(data => {
+                citySelect.innerHTML = '<option value="">Select District/City</option>';
+                data.districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district;
+                    option.textContent = district;
+                    citySelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error('Error loading districts:', err);
+                citySelect.innerHTML = '<option value="">Error loading</option>';
+            });
+    }
+
     const typeJobseeker = document.getElementById('typeJobseeker');
     const typeEmployer = document.getElementById('typeEmployer');
     const employerFields = document.getElementById('employerFields');
@@ -527,8 +580,8 @@
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value)) { showError('email','emailError'); v=false; }
         if (!/^\d{10}$/.test(document.getElementById('mobile').value)) { showError('mobile','mobileError'); v=false; }
         if (document.getElementById('domain').value.trim().length<2) { showError('domain','domainError'); v=false; }
-        if (document.getElementById('city').value.trim().length<2) { showError('city','cityError'); v=false; }
-        if (document.getElementById('state').value.trim().length<2) { showError('state','stateError'); v=false; }
+        if (!document.getElementById('citySelect').value) { showError('citySelect','cityError'); v=false; }
+        if (!document.getElementById('stateSelect').value) { showError('stateSelect','stateError'); v=false; }
         if (passwordInput.value.length<6) { showError('password','passwordError'); v=false; }
         if (!document.getElementById('termsCheck').checked) { alert('Please agree to Terms'); v=false; }
         if (typeEmployer.checked && companyNameInput.value.trim().length<2) { alert('Enter company name'); v=false; }

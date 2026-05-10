@@ -21,7 +21,6 @@
     .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
     .stat-card .stat-number { font-size: 2rem; font-weight: 800; }
     .stat-card .stat-label { font-size: 0.72rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-    
     .stat-card.purple .stat-number { color: #8b5cf6; }
     .stat-card.green .stat-number { color: #10b981; }
     .stat-card.blue .stat-number { color: #3b82f6; }
@@ -35,9 +34,7 @@
         transition: all 0.3s; text-decoration: none; color: #1e293b;
         display: block; height: 100%; border: none; cursor: pointer; width: 100%;
     }
-    .admin-nav-card:hover {
-        transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1);
-    }
+    .admin-nav-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,.1); }
     .admin-nav-card .nav-icon { font-size: 2.2rem; margin-bottom: 10px; display: block; }
     .admin-nav-card h6 { font-weight: 700; margin: 0 0 4px; font-size: 0.95rem; }
     .admin-nav-card small { color: #64748b; font-size: 0.75rem; }
@@ -45,26 +42,11 @@
     /* Scraping Control Card */
     .scrape-control-card {
         background: linear-gradient(135deg, #1e293b, #334155);
-        border-radius: 16px; padding: 24px;
+        border-radius: 16px; padding: 20px 24px;
         color: white; margin-bottom: 20px;
     }
     .scrape-control-card h5 { font-weight: 700; margin-bottom: 4px; }
     .scrape-control-card p { opacity: 0.7; font-size: 0.85rem; margin: 0; }
-    
-    .btn-scrape-full {
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        color: white; border: none; padding: 12px 24px;
-        border-radius: 12px; font-weight: 700; font-size: 0.9rem;
-        transition: all 0.3s; cursor: pointer;
-    }
-    .btn-scrape-full:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,0.4); }
-    
-    .btn-scrape-light {
-        background: white; color: #f59e0b; border: 2px solid #f59e0b;
-        padding: 12px 24px; border-radius: 12px; font-weight: 700;
-        font-size: 0.9rem; cursor: pointer; transition: all 0.3s;
-    }
-    .btn-scrape-light:hover:not(:disabled) { background: #fef3c7; }
     
     .scrape-status {
         display: inline-block; padding: 6px 14px; border-radius: 50px;
@@ -72,11 +54,21 @@
     }
     .status-running { background: #fef3c7; color: #92400e; animation: pulse 1.5s infinite; }
     .status-idle { background: #d1fae5; color: #065f46; }
+    .status-paused { background: #fef3c7; color: #92400e; }
+    .status-disabled { background: #fee2e2; color: #991b1b; }
     
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.6; }
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    
+    .btn-scrape { padding: 8px 12px; font-size: 0.75rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-scrape-full { background: #f59e0b; color: #1e293b; }
+    .btn-scrape-full:hover:not(:disabled) { background: #d97706; }
+    .btn-scrape-light { background: white; color: #f59e0b; border: 2px solid #f59e0b; }
+    .btn-scrape-light:hover:not(:disabled) { background: #fef3c7; }
+    .btn-scrape-warning { background: #f59e0b; color: white; }
+    .btn-scrape-danger { background: #ef4444; color: white; }
+    .btn-scrape-success { background: #10b981; color: white; }
+    .btn-scrape-outline { background: transparent; color: white; border: 1px solid rgba(255,255,255,0.5); }
+    .btn-scrape:disabled { opacity: 0.5; cursor: not-allowed; }
     
     .table td { vertical-align: middle; font-size: 0.85rem; }
     .btn-delete { padding: 4px 10px; font-size: 0.7rem; }
@@ -105,27 +97,52 @@
             </div>
         </div>
         
-        <!-- ⭐ SCRAPING CONTROL PANEL -->
+        <!-- ⭐⭐⭐ SCRAPING CONTROL PANEL ⭐⭐⭐ -->
         <div class="scrape-control-card">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-spider me-2"></i>Job Scraping Control</h5>
-                    <p>Start or stop job scraping from multiple websites</p>
+                <div class="col-lg-4 mb-3 mb-lg-0">
+                    <h5><i class="fas fa-spider me-2"></i>Scraping Control Panel</h5>
+                    <p>Start, pause, or stop job scraping operations</p>
                     <div class="mt-2">
                         <span class="scrape-status" id="scrapeStatus">
-                            <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>
-                            Checking...
+                            <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i> Checking...
                         </span>
                     </div>
-                </div>
-                <div class="col-md-6 text-end mt-3 mt-md-0">
-                    <button class="btn-scrape-light me-2" id="btnLightScrape" onclick="startLightScrape()">
-                        <i class="fas fa-bolt me-1"></i> Quick Scrape
-                    </button>
-                    <button class="btn-scrape-full" id="btnFullScrape" onclick="startFullScrape()">
-                        <i class="fas fa-rocket me-1"></i> Full Scrape
-                    </button>
                     <div id="scrapeProgress" class="mt-2 text-white-50 small" style="display:none;"></div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row g-2">
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-full w-100" id="btnFullScrape" onclick="startFullScrape()">
+                                <i class="fas fa-rocket me-1"></i> Full
+                            </button>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-light w-100" id="btnLightScrape" onclick="startLightScrape()">
+                                <i class="fas fa-bolt me-1"></i> Quick
+                            </button>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-warning w-100" id="btnPause" onclick="pauseScraper()">
+                                <i class="fas fa-pause me-1"></i> Pause
+                            </button>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-success w-100" id="btnResume" onclick="resumeScraper()" disabled>
+                                <i class="fas fa-play me-1"></i> Resume
+                            </button>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-danger w-100" id="btnStop" onclick="stopScraper()">
+                                <i class="fas fa-stop me-1"></i> Stop
+                            </button>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <button class="btn-scrape btn-scrape-outline w-100" id="btnDisable" onclick="toggleScraper()">
+                                <i class="fas fa-power-off me-1"></i> Disable
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -187,13 +204,13 @@
             <div class="col-md-3 mb-3">
                 <a href="{{ url_for('admin_scraper.manage_websites') }}" class="admin-nav-card">
                     <span class="nav-icon" style="color:#3b82f6;"><i class="fas fa-globe"></i></span>
-                    <h6>Scraper Settings</h6><small>Websites, keywords</small>
+                    <h6>Scraper Settings</h6><small>Websites, keywords, locations</small>
                 </a>
             </div>
             <div class="col-md-3 mb-3">
                 <a href="{{ url_for('admin.admin_donations') }}" class="admin-nav-card">
                     <span class="nav-icon" style="color:#f59e0b;"><i class="fas fa-hand-holding-heart"></i></span>
-                    <h6>Donations</h6><small>View records</small>
+                    <h6>Donations</h6><small>View all records</small>
                 </a>
             </div>
         </div>
@@ -260,27 +277,50 @@
 </div>
 
 <script>
-    // ⭐ SCRAPING FUNCTIONS
-    let scrapeInterval = null;
+    // ⭐ SCRAPER CONTROL FUNCTIONS
+    let statusInterval = null;
     
     function checkScrapeStatus() {
-        fetch('/api/scrape-status')
+        fetch('/api/scraper/control-status')
             .then(r => r.json())
             .then(data => {
                 const statusEl = document.getElementById('scrapeStatus');
-                if (data.running) {
+                const progressEl = document.getElementById('scrapeProgress');
+                
+                if (!data.enabled) {
+                    statusEl.className = 'scrape-status status-disabled';
+                    statusEl.innerHTML = '<i class="fas fa-power-off me-1"></i> Disabled';
+                    document.getElementById('btnDisable').innerHTML = '<i class="fas fa-power-off me-1"></i> Enable';
+                    document.getElementById('btnDisable').classList.add('btn-scrape-success');
+                    progressEl.style.display = 'none';
+                } else if (data.paused) {
+                    statusEl.className = 'scrape-status status-paused';
+                    statusEl.innerHTML = '<i class="fas fa-pause-circle me-1"></i> Paused';
+                    document.getElementById('btnPause').disabled = true;
+                    document.getElementById('btnResume').disabled = false;
+                    progressEl.style.display = 'none';
+                } else if (data.running) {
                     statusEl.className = 'scrape-status status-running';
-                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Running: ' + data.current;
-                    document.getElementById('scrapeProgress').style.display = 'block';
-                    document.getElementById('scrapeProgress').textContent = 'Progress: ' + data.progress + ' | Scraped today: ' + (data.added_today || data.total_jobs || '...');
+                    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Running: ' + (data.current_site || '...');
+                    progressEl.style.display = 'block';
+                    progressEl.textContent = 'Progress: ' + data.progress + ' | Jobs: ' + (data.jobs_added || 0);
+                    document.getElementById('btnPause').disabled = false;
+                    document.getElementById('btnResume').disabled = true;
                 } else {
                     statusEl.className = 'scrape-status status-idle';
-                    statusEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Idle | ' + data.total_jobs + ' scraped jobs in DB';
-                    document.getElementById('scrapeProgress').style.display = 'none';
+                    statusEl.innerHTML = '<i class="fas fa-check-circle me-1"></i> Idle';
+                    document.getElementById('btnDisable').innerHTML = '<i class="fas fa-power-off me-1"></i> Disable';
+                    document.getElementById('btnDisable').classList.remove('btn-scrape-success');
+                    document.getElementById('btnPause').disabled = false;
+                    document.getElementById('btnResume').disabled = true;
+                    progressEl.style.display = 'none';
                 }
-                // Update stats
-                document.getElementById('totalJobs').textContent = data.total_jobs || '0';
-                document.getElementById('activeJobs').textContent = data.total_jobs || '0';
+                
+                // Update job counts
+                if (data.total_jobs) {
+                    document.getElementById('totalJobs').textContent = data.total_jobs;
+                    document.getElementById('activeJobs').textContent = data.total_jobs;
+                }
             })
             .catch(() => {
                 document.getElementById('scrapeStatus').className = 'scrape-status status-idle';
@@ -289,75 +329,57 @@
     }
     
     function startFullScrape() {
+        if (!confirm('Start FULL scrape? This will scrape ALL websites and may take time.')) return;
         const btn = document.getElementById('btnFullScrape');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
-        
-        fetch('/scrape-jobs-now')
-            .then(() => {
-                btn.innerHTML = '<i class="fas fa-check me-1"></i> Started!';
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-rocket me-1"></i> Full Scrape';
-                }, 3000);
-                checkScrapeStatus();
-                if (scrapeInterval) clearInterval(scrapeInterval);
-                scrapeInterval = setInterval(checkScrapeStatus, 5000);
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-rocket me-1"></i> Full Scrape';
-                alert('Failed to start scraping');
-            });
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch('/scrape-jobs-now').then(() => { setTimeout(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-rocket me-1"></i> Full'; checkScrapeStatus(); }, 3000); });
     }
     
     function startLightScrape() {
         const btn = document.getElementById('btnLightScrape');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Starting...';
-        
-        fetch('/scrape-light')
-            .then(() => {
-                btn.innerHTML = '<i class="fas fa-check me-1"></i> Started!';
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Quick Scrape';
-                }, 3000);
-                checkScrapeStatus();
-                if (scrapeInterval) clearInterval(scrapeInterval);
-                scrapeInterval = setInterval(checkScrapeStatus, 5000);
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Quick Scrape';
-                alert('Failed to start scraping');
-            });
+        btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch('/scrape-light').then(() => { setTimeout(() => { btn.disabled = false; btn.innerHTML = '<i class="fas fa-bolt me-1"></i> Quick'; checkScrapeStatus(); }, 2000); });
+    }
+    
+    function pauseScraper() {
+        fetch('/api/scraper/pause').then(r => r.json()).then(data => { alert(data.message); checkScrapeStatus(); });
+    }
+    
+    function resumeScraper() {
+        fetch('/api/scraper/resume').then(r => r.json()).then(data => { alert(data.message); checkScrapeStatus(); });
+    }
+    
+    function stopScraper() {
+        if (!confirm('STOP scraping immediately? Unsaved jobs may be lost.')) return;
+        fetch('/api/scraper/stop').then(r => r.json()).then(data => { alert(data.message); checkScrapeStatus(); });
+    }
+    
+    function toggleScraper() {
+        const btn = document.getElementById('btnDisable');
+        if (btn.textContent.includes('Disable')) {
+            fetch('/api/scraper/disable').then(r => r.json()).then(data => { alert(data.message); checkScrapeStatus(); });
+        } else {
+            fetch('/api/scraper/enable').then(r => r.json()).then(data => { alert(data.message); checkScrapeStatus(); });
+        }
     }
     
     // Delete functions
     function deleteUser(id, name) {
         if (confirm('Delete "' + name + '"?\nThis cannot be undone!')) {
-            fetch('/admin/delete-user/' + id, { method: 'POST' })
-                .then(r => r.json())
-                .then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
+            fetch('/admin/delete-user/' + id, { method: 'POST' }).then(r => r.json()).then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
         }
     }
     
     function deleteJob(id, title) {
         if (confirm('Delete "' + title + '"?\nThis cannot be undone!')) {
-            fetch('/admin/delete-job/' + id, { method: 'POST' })
-                .then(r => r.json())
-                .then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
+            fetch('/admin/delete-job/' + id, { method: 'POST' }).then(r => r.json()).then(d => { if (d.success) { alert('Deleted!'); location.reload(); } else alert(d.message); });
         }
     }
     
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         checkScrapeStatus();
-        // Check status every 30 seconds if not already checking
-        setInterval(function() {
-            if (!scrapeInterval) checkScrapeStatus();
-        }, 30000);
+        statusInterval = setInterval(checkScrapeStatus, 10000);
     });
 </script>
 {% endblock %}

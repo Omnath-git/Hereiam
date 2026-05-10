@@ -5,20 +5,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-here')
+    SECRET_KEY = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key')
     
-    # ⭐ SQLite के लिए URI में भी timeout जोड़ें
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db?timeout=30'
+    # ⭐ Main database (Users, Donations, Admin, Scraper Config)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///main.db?timeout=30'
+    
+    # ⭐ Separate binds for different databases
+    SQLALCHEMY_BINDS = {
+        'main': 'sqlite:///main.db?timeout=30',      # Users, Admin, Donations, Scraper Config
+        'jobs': 'sqlite:///jobs.db?timeout=30',       # Jobs only
+        'profiles': 'sqlite:///profiles.db?timeout=30' # Profile pages tracking
+    }
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
-        'connect_args': {
-            'timeout': 30,
-            'check_same_thread': False,
-        },
-        'pool_size': 10,
-        'pool_recycle': 3600,
-        'pool_pre_ping': True,
+        'connect_args': {'timeout': 30, 'check_same_thread': False},
+        'pool_size': 10, 'pool_recycle': 3600, 'pool_pre_ping': True,
     }
     
     UPLOAD_FOLDER = 'static/uploads/profile_photos'

@@ -440,7 +440,32 @@
     }
 </style>
 {% endblock %}
+<!-- index.html के filter section में -->
 
+{% if active_tab == 'professionals' %}
+<div class="filter-row">
+    <!-- ... domain filter ... -->
+    
+    <div class="filter-group">
+        <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> State / UT</label>
+        <select name="state" class="filter-select" id="filterState" onchange="this.form.submit()">
+            <option value="">All States</option>
+            {% for state in prof_states %}
+                <option value="{{ state[0] }}" {% if current_state == state[0] %}selected{% endif %}>{{ state[0] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="filter-group">
+        <label class="filter-label"><i class="fas fa-city me-1"></i> District/City</label>
+        <select name="city" class="filter-select" id="filterCity" onchange="this.form.submit()">
+            <option value="">All Districts</option>
+            {% for city in prof_cities %}
+                <option value="{{ city[0] }}" {% if current_city == city[0] %}selected{% endif %}>{{ city[0] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+{% endif %}
 {% block content %}
 
     <!-- Tab Navigation -->
@@ -461,126 +486,205 @@
         </li>
     </ul>
     
-    <!-- ⭐ DYNAMIC FILTER SECTION -->
-    <div class="filter-card">
-        <div class="card-body">
-            <form method="GET" action="{{ url_for('main.index') }}" id="filterForm">
-                <input type="hidden" name="tab" value="{{ active_tab }}">
-                
-                {% if active_tab == 'professionals' %}
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-briefcase me-1"></i> Domain</label>
-                        <select name="domain" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Domains ({{ prof_domains|length }})</option>
-                            {% for domain in prof_domains %}
-                                <option value="{{ domain[0] }}" {% if current_domain == domain[0] %}selected{% endif %}>{{ domain[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> State</label>
-                        <select name="state" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All States ({{ prof_states|length }})</option>
-                            {% for state in prof_states %}
-                                <option value="{{ state[0] }}" {% if current_state == state[0] %}selected{% endif %}>{{ state[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-city me-1"></i> City</label>
-                        <select name="city" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Cities ({{ prof_cities|length }})</option>
-                            {% for city in prof_cities %}
-                                <option value="{{ city[0] }}" {% if current_city == city[0] %}selected{% endif %}>{{ city[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-rupee-sign me-1"></i> Expected Salary</label>
-                        <select name="salary" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Salaries</option>
-                            {% for salary in prof_salaries %}
-                                <option value="{{ salary[0] }}" {% if current_salary == salary[0] %}selected{% endif %}>{{ salary[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-calendar-alt me-1"></i> Notice Period</label>
-                        <select name="notice" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Notice Periods</option>
-                            {% for notice in prof_notices %}
-                                <option value="{{ notice[0] }}" {% if current_notice == notice[0] %}selected{% endif %}>{{ notice[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group" style="flex:0 0 auto;">
-                        <label class="filter-label">&nbsp;</label>
-                        <a href="{{ url_for('main.index', tab='professionals') }}" class="btn-filter-reset">
-                            <i class="fas fa-redo me-1"></i> Reset
-                        </a>
-                    </div>
-                </div>
-                {% else %}
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-briefcase me-1"></i> Job Title</label>
-                        <select name="domain" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Jobs ({{ jobs|length }})</option>
-                            {% for job_title in job_domains[:50] %}
-                                <option value="{{ job_title[0] }}" {% if current_domain == job_title[0] %}selected{% endif %}>{{ job_title[0][:50] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> Location</label>
-                        <select name="state" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Locations ({{ job_states|length }})</option>
-                            {% for loc in job_states[:50] %}
-                                <option value="{{ loc[0] }}" {% if current_state == loc[0] %}selected{% endif %}>{{ loc[0][:40] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-clock me-1"></i> Job Type</label>
-                        <select name="job_type" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Types</option>
-                            {% for type in job_types %}
-                                <option value="{{ type[0] }}" {% if current_job_type == type[0] %}selected{% endif %}>{{ type[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label class="filter-label"><i class="fas fa-star me-1"></i> Experience</label>
-                        <select name="experience" class="filter-select" onchange="this.form.submit()">
-                            <option value="">All Experience</option>
-                            {% for exp in job_experiences[:30] %}
-                                <option value="{{ exp[0] }}" {% if current_experience == exp[0] %}selected{% endif %}>{{ exp[0] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="filter-group" style="flex:0 0 auto;">
-                        <label class="filter-label">&nbsp;</label>
-                        <a href="{{ url_for('main.index', tab='jobs') }}" class="btn-filter-reset">
-                            <i class="fas fa-redo me-1"></i> Reset
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-            </form>
+<!-- ⭐ DYNAMIC FILTER SECTION -->
+<div class="filter-card">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('main.index') }}" id="filterForm">
+            <input type="hidden" name="tab" value="{{ active_tab }}">
             
-            {% if current_domain or current_state or current_city or current_salary or current_notice or current_job_type or current_experience %}
-            <div class="active-filters">
-                <span style="font-size:0.75rem;color:#64748b;"><i class="fas fa-filter me-1"></i> Active:</span>
-                {% if current_domain %}<span class="filter-badge">{{ current_domain[:25] }} <a href="{{ url_for('main.index', tab=active_tab, state=current_state, city=current_city, salary=current_salary, notice=current_notice, job_type=current_job_type, experience=current_experience) }}">&times;</a></span>{% endif %}
-                {% if current_state %}<span class="filter-badge">{{ current_state[:25] }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, city=current_city, salary=current_salary, notice=current_notice, job_type=current_job_type, experience=current_experience) }}">&times;</a></span>{% endif %}
-                {% if current_city %}<span class="filter-badge">{{ current_city[:25] }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, salary=current_salary, notice=current_notice, job_type=current_job_type, experience=current_experience) }}">&times;</a></span>{% endif %}
-                {% if current_salary %}<span class="filter-badge">{{ current_salary }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, notice=current_notice, job_type=current_job_type, experience=current_experience) }}">&times;</a></span>{% endif %}
-                {% if current_notice %}<span class="filter-badge">{{ current_notice }} <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, salary=current_salary, job_type=current_job_type, experience=current_experience) }}">&times;</a></span>{% endif %}
+            {% if active_tab == 'professionals' %}
+            <!-- ========== PROFESSIONALS FILTERS ========== -->
+            <div class="filter-row">
+                <!-- Domain -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-briefcase me-1"></i> Domain</label>
+                    <select name="domain" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Domains ({{ prof_domains|length }})</option>
+                        {% for domain in prof_domains %}
+                            <option value="{{ domain[0] }}" {% if current_domain == domain[0] %}selected{% endif %}>{{ domain[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- ⭐ State Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> State / UT</label>
+                    <select name="state" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All States ({{ prof_states|length }})</option>
+                        {% for state in prof_states %}
+                            <option value="{{ state[0] }}" {% if current_state == state[0] %}selected{% endif %}>{{ state[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- ⭐ District/City Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-city me-1"></i> District/City</label>
+                    <select name="city" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Districts ({{ prof_cities|length }})</option>
+                        {% for city in prof_cities %}
+                            <option value="{{ city[0] }}" {% if current_city == city[0] %}selected{% endif %}>{{ city[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Expected Salary -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-rupee-sign me-1"></i> Expected Salary</label>
+                    <select name="salary" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Salaries</option>
+                        {% for salary in prof_salaries %}
+                            <option value="{{ salary[0] }}" {% if current_salary == salary[0] %}selected{% endif %}>{{ salary[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Notice Period -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-calendar-alt me-1"></i> Notice Period</label>
+                    <select name="notice" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Notice Periods</option>
+                        {% for notice in prof_notices %}
+                            <option value="{{ notice[0] }}" {% if current_notice == notice[0] %}selected{% endif %}>{{ notice[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Reset -->
+                <div class="filter-group" style="flex:0 0 auto;">
+                    <label class="filter-label">&nbsp;</label>
+                    <a href="{{ url_for('main.index', tab='professionals') }}" class="btn-filter-reset">
+                        <i class="fas fa-redo me-1"></i> Reset
+                    </a>
+                </div>
+            </div>
+            
+            {% else %}
+            <!-- ========== JOBS FILTERS ========== -->
+            <div class="filter-row">
+                <!-- Job Title -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-briefcase me-1"></i> Job Title</label>
+                    <select name="domain" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Jobs ({{ jobs|length }})</option>
+                        {% for job_title in job_domains[:50] %}
+                            <option value="{{ job_title[0] }}" {% if current_domain == job_title[0] %}selected{% endif %}>{{ job_title[0][:50] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- ⭐ State Filter for Jobs -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-map-marker-alt me-1"></i> State / UT</label>
+                    <select name="state" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All States ({{ prof_states|length }})</option>
+                        {% for state in prof_states %}
+                            <option value="{{ state[0] }}" {% if current_state == state[0] %}selected{% endif %}>{{ state[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- ⭐ District/City Filter for Jobs -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-city me-1"></i> District/City</label>
+                    <select name="city" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Districts ({{ prof_cities|length }})</option>
+                        {% for city in prof_cities %}
+                            <option value="{{ city[0] }}" {% if current_city == city[0] %}selected{% endif %}>{{ city[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Job Type -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-clock me-1"></i> Job Type</label>
+                    <select name="job_type" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Types</option>
+                        {% for type in job_types %}
+                            <option value="{{ type[0] }}" {% if current_job_type == type[0] %}selected{% endif %}>{{ type[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Experience -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-star me-1"></i> Experience</label>
+                    <select name="experience" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All Experience</option>
+                        {% for exp in job_experiences[:30] %}
+                            <option value="{{ exp[0] }}" {% if current_experience == exp[0] %}selected{% endif %}>{{ exp[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Reset -->
+                <div class="filter-group" style="flex:0 0 auto;">
+                    <label class="filter-label">&nbsp;</label>
+                    <a href="{{ url_for('main.index', tab='jobs') }}" class="btn-filter-reset">
+                        <i class="fas fa-redo me-1"></i> Reset
+                    </a>
+                </div>
             </div>
             {% endif %}
+        </form>
+        
+        <!-- Active Filters Display -->
+        {% if current_domain or current_state or current_city or current_salary or current_notice or current_job_type or current_experience %}
+        <div class="active-filters">
+            <span style="font-size:0.75rem;color:#64748b;"><i class="fas fa-filter me-1"></i> Active:</span>
+            
+            {% if current_domain %}
+            <span class="filter-badge">
+                {{ current_domain[:25] }}
+                <a href="{{ url_for('main.index', tab=active_tab, state=current_state, city=current_city, salary=current_salary if active_tab=='professionals' else '', notice=current_notice if active_tab=='professionals' else '', job_type=current_job_type if active_tab=='jobs' else '', experience=current_experience if active_tab=='jobs' else '') }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_state %}
+            <span class="filter-badge">
+                {{ current_state[:25] }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, city=current_city, salary=current_salary if active_tab=='professionals' else '', notice=current_notice if active_tab=='professionals' else '', job_type=current_job_type if active_tab=='jobs' else '', experience=current_experience if active_tab=='jobs' else '') }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_city %}
+            <span class="filter-badge">
+                {{ current_city[:25] }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, salary=current_salary if active_tab=='professionals' else '', notice=current_notice if active_tab=='professionals' else '', job_type=current_job_type if active_tab=='jobs' else '', experience=current_experience if active_tab=='jobs' else '') }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_salary and active_tab == 'professionals' %}
+            <span class="filter-badge">
+                {{ current_salary }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, notice=current_notice, job_type=current_job_type, experience=current_experience) }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_notice and active_tab == 'professionals' %}
+            <span class="filter-badge">
+                {{ current_notice }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, salary=current_salary, job_type=current_job_type, experience=current_experience) }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_job_type and active_tab == 'jobs' %}
+            <span class="filter-badge">
+                {{ current_job_type }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, experience=current_experience) }}">&times;</a>
+            </span>
+            {% endif %}
+            
+            {% if current_experience and active_tab == 'jobs' %}
+            <span class="filter-badge">
+                {{ current_experience }}
+                <a href="{{ url_for('main.index', tab=active_tab, domain=current_domain, state=current_state, city=current_city, job_type=current_job_type) }}">&times;</a>
+            </span>
+            {% endif %}
         </div>
+        {% endif %}
     </div>
+</div>
     
     <!-- Results Info -->
     <div class="results-info">

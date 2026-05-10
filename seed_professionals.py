@@ -1,6 +1,6 @@
 """
 =============================================================================
-Professionals Data Bank - Bulk Professional Data Seeder
+Here I Am - Bulk Professional Data Seeder
 =============================================================================
 हर डोमेन के 50 प्रोफेशनल्स बनाता है और उनके प्रोफाइल HTML पेज जनरेट करता है
 =============================================================================
@@ -270,7 +270,7 @@ def seed_professionals(professionals_per_domain=50):
         total_profiles_generated = 0
         
         print("\n" + "="*70)
-        print(f"🚀 PROFESSIONALS DATA BANK - BULK SEEDER")
+        print(f"🚀 Here I Am - BULK SEEDER")
         print(f"📋 Domains: {len(DOMAINS)}")
         print(f"👤 Professionals per domain: {professionals_per_domain}")
         print(f"📊 Total to create: {len(DOMAINS) * professionals_per_domain}")

@@ -324,7 +324,74 @@
         </div>
     </div>
 </div>
+<!-- edit_profile.html में state/city section -->
 
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">State</label>
+        <select name="state" class="form-select" id="editStateSelect" onchange="loadEditDistricts()">
+            <option value="{{ user.state }}">{{ user.state or 'Select State' }}</option>
+        </select>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">District/City</label>
+        <select name="city" class="form-select" id="editCitySelect">
+            <option value="{{ user.city }}">{{ user.city or 'Select District' }}</option>
+        </select>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadEditStates();
+});
+
+function loadEditStates() {
+    fetch('/api/states')
+        .then(r => r.json())
+        .then(data => {
+            const select = document.getElementById('editStateSelect');
+            const currentState = select.value;
+            
+            data.states.forEach(state => {
+                if (state !== currentState) {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    select.appendChild(option);
+                }
+            });
+            
+            // Load districts for current state
+            if (currentState) {
+                loadEditDistricts();
+            }
+        });
+}
+
+function loadEditDistricts() {
+    const state = document.getElementById('editStateSelect').value;
+    const citySelect = document.getElementById('editCitySelect');
+    const currentCity = citySelect.value;
+    
+    citySelect.innerHTML = '<option value="">Loading...</option>';
+    
+    if (!state) return;
+    
+    fetch('/api/districts/' + encodeURIComponent(state))
+        .then(r => r.json())
+        .then(data => {
+            citySelect.innerHTML = '<option value="">Select District</option>';
+            data.districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district;
+                option.textContent = district;
+                if (district === currentCity) option.selected = true;
+                citySelect.appendChild(option);
+            });
+        });
+}
+</script>
 <!-- Toast Notification -->
 <div class="toast-container position-fixed top-0 end-0 p-3">
     <div id="saveToast" class="toast" role="alert">

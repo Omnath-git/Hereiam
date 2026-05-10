@@ -1,945 +1,659 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Post a Job - Here I am | Vibrant Recruitment</title>
+    <!-- Google Fonts + Bootstrap 5 + Font Awesome 6 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}Post a Job - Here I am{% endblock %}
+        body {
+            background: linear-gradient(145deg, #f9f3ff 0%, #ffe9f4 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+        }
 
-{% block extra_css %}
-<style>
-    /* ============================================================
-       POST JOB PAGE STYLES
-       ============================================================ */
-    
-    .post-job-container {
-        min-height: calc(100vh - var(--navbar-height) - 40px);
-        padding: 40px 0;
-    }
-    
-    /* Header */
-    .post-job-header {
-        background: var(--gradient-dark);
-        border-radius: var(--radius-2xl);
-        padding: 36px 40px;
-        margin-bottom: 24px;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .post-job-header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
-    }
-    
-    .post-job-header h1 {
-        color: var(--white);
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: 2rem;
-        margin-bottom: 6px;
-        position: relative;
-    }
-    
-    .post-job-header p {
-        color: rgba(255,255,255,0.7);
-        margin: 0;
-        position: relative;
-        font-size: 0.95rem;
-    }
-    
-    /* Main Card */
-    .post-job-card {
-        background: var(--white);
-        border-radius: var(--radius-2xl);
-        box-shadow: var(--shadow-lg);
-        overflow: hidden;
-    }
-    
-    .post-job-card .card-body {
-        padding: 36px 40px;
-    }
-    
-    /* Section Headers */
-    .section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--gray-800);
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid var(--gray-100);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .section-title i {
-        color: var(--primary);
-        font-size: 1.2rem;
-    }
-    
-    /* Form Styles */
-    .form-label {
-        font-weight: 600;
-        font-size: 0.82rem;
-        color: var(--gray-700);
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .form-label .required {
-        color: var(--danger);
-        margin-left: 2px;
-    }
-    
-    .form-control,
-    .form-select {
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        padding: 12px 16px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--gray-800);
-        transition: all var(--transition-fast);
-        background: var(--gray-50);
-    }
-    
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-        background: var(--white);
-        outline: none;
-    }
-    
-    .form-control::placeholder {
-        color: var(--gray-400);
-        font-weight: 400;
-    }
-    
-    textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-    
-    /* Input with Icon */
-    .input-icon-wrap {
-        position: relative;
-    }
-    
-    .input-icon-wrap .form-control {
-        padding-left: 42px;
-    }
-    
-    .input-icon-wrap .input-icon {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--gray-400);
-        font-size: 1rem;
-        transition: color var(--transition-fast);
-        pointer-events: none;
-    }
-    
-    .input-icon-wrap .form-control:focus ~ .input-icon {
-        color: var(--primary);
-    }
-    
-    /* Apply Method Selector */
-    .apply-method-selector {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-    
-    .apply-method-option {
-        flex: 1;
-    }
-    
-    .apply-method-option input[type="radio"] {
-        display: none;
-    }
-    
-    .apply-method-option label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 14px;
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--gray-600);
-        transition: all var(--transition-base);
-        background: var(--white);
-        text-align: center;
-    }
-    
-    .apply-method-option label:hover {
-        border-color: var(--primary-light);
-        background: var(--primary-bg);
-    }
-    
-    .apply-method-option input[type="radio"]:checked + label {
-        border-color: var(--primary);
-        background: var(--primary-bg);
-        color: var(--primary-dark);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-    }
-    
-    .apply-method-option label i {
-        font-size: 1.1rem;
-    }
-    
-    /* Skills Tags Input */
-    .skills-input-container {
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-md);
-        padding: 8px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        min-height: 48px;
-        background: var(--gray-50);
-        cursor: text;
-        transition: all var(--transition-fast);
-    }
-    
-    .skills-input-container:focus-within {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-        background: var(--white);
-    }
-    
-    .skill-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--primary-bg);
-        color: var(--primary-dark);
-        padding: 6px 12px;
-        border-radius: var(--radius-full);
-        font-size: 0.8rem;
-        font-weight: 600;
-        animation: tagPop 0.2s ease;
-    }
-    
-    @keyframes tagPop {
-        from { transform: scale(0.8); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-    
-    .skill-tag .remove-tag {
-        cursor: pointer;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        background: rgba(139, 92, 246, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.65rem;
-        transition: all var(--transition-fast);
-        border: none;
-        color: var(--primary-dark);
-    }
-    
-    .skill-tag .remove-tag:hover {
-        background: var(--danger);
-        color: white;
-    }
-    
-    .skills-input {
-        border: none;
-        outline: none;
-        flex: 1;
-        min-width: 120px;
-        padding: 6px;
-        font-size: 0.85rem;
-        background: transparent;
-    }
-    
-    /* Job Type Selector */
-    .job-type-selector {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-    
-    .job-type-option input[type="radio"] {
-        display: none;
-    }
-    
-    .job-type-option label {
-        padding: 8px 16px;
-        border: 2px solid var(--gray-200);
-        border-radius: var(--radius-full);
-        cursor: pointer;
-        font-weight: 500;
-        font-size: 0.82rem;
-        color: var(--gray-600);
-        transition: all var(--transition-fast);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .job-type-option label:hover {
-        border-color: var(--primary-light);
-    }
-    
-    .job-type-option input[type="radio"]:checked + label {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: white;
-    }
-    
-    /* Action Buttons */
-    .action-buttons {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        margin-top: 32px;
-        padding-top: 24px;
-        border-top: 2px solid var(--gray-100);
-    }
-    
-    .btn-preview {
-        padding: 12px 24px;
-        border: 2px solid var(--gray-300);
-        background: var(--white);
-        color: var(--gray-700);
-        border-radius: var(--radius-full);
-        font-weight: 600;
-        transition: all var(--transition-base);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .btn-preview:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-        background: var(--primary-bg);
-    }
-    
-    .btn-post {
-        padding: 12px 32px;
-        background: var(--primary-gradient);
-        color: var(--white);
-        border: none;
-        border-radius: var(--radius-full);
-        font-weight: 700;
-        font-size: 1rem;
-        transition: all var(--transition-base);
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .btn-post:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-    }
-    
-    .btn-post:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    /* Info Box */
-    .info-box {
-        background: var(--info-light);
-        border-left: 4px solid var(--info);
-        border-radius: var(--radius-md);
-        padding: 16px 20px;
-        margin-bottom: 24px;
-        display: flex;
-        gap: 12px;
-    }
-    
-    .info-box i {
-        color: var(--info);
-        font-size: 1.2rem;
-        margin-top: 2px;
-    }
-    
-    .info-box p {
-        margin: 0;
-        font-size: 0.85rem;
-        color: var(--gray-700);
-        line-height: 1.5;
-    }
-    
-    /* Character Counter */
-    .char-counter {
-        text-align: right;
-        font-size: 0.75rem;
-        color: var(--gray-400);
-        margin-top: 4px;
-    }
-    
-    .char-counter.warning {
-        color: var(--warning);
-    }
-    
-    .char-counter.danger {
-        color: var(--danger);
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
+        /* custom variables */
+        :root {
+            --primary: #c026d3;
+            --primary-dark: #a21caf;
+            --primary-light: #f3e8ff;
+            --secondary: #f97316;
+            --success: #10b981;
+            --info: #3b82f6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gradient-hero: linear-gradient(135deg, #4f46e5 0%, #c026d3 100%);
+            --gradient-card: linear-gradient(125deg, #ffffff 0%, #fffafc 100%);
+            --shadow-xl: 0 25px 45px -12px rgba(0, 0, 0, 0.25);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            --radius-2xl: 2rem;
+            --radius-xl: 1.25rem;
+            --radius-md: 0.75rem;
+        }
+
+        /* navbar simulation (light) */
+        .custom-navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(192, 38, 211, 0.2);
+            padding: 1rem 2rem;
+        }
+
+        /* main container */
+        .post-job-container {
+            min-height: calc(100vh - 80px);
+            padding: 3rem 0 4rem;
+        }
+
+        /* colorful animated header */
         .post-job-header {
-            padding: 24px 20px;
-            border-radius: var(--radius-lg);
+            background: var(--gradient-hero);
+            border-radius: var(--radius-2xl);
+            padding: 2.2rem 2.8rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            transition: all 0.3s ease;
         }
-        
-        .post-job-header h1 {
-            font-size: 1.5rem;
-        }
-        
-        .post-job-card .card-body {
-            padding: 20px;
-        }
-        
-        .apply-method-selector {
-            flex-direction: column;
-        }
-        
-        .action-buttons {
-            flex-direction: column;
-        }
-        
-        .btn-preview,
-        .btn-post {
-            width: 100%;
-            justify-content: center;
-        }
-        
-        .job-type-selector {
-            gap: 6px;
-        }
-        
-        .job-type-option label {
-            padding: 6px 12px;
-            font-size: 0.75rem;
-        }
-    }
-</style>
-{% endblock %}
 
-{% block content %}
+        .post-job-header::after {
+            content: "✨";
+            font-size: 180px;
+            position: absolute;
+            bottom: -30px;
+            right: -20px;
+            opacity: 0.1;
+            pointer-events: none;
+            transform: rotate(-10deg);
+        }
+
+        .post-job-header h1 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff, #ffe6fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .post-job-header p {
+            font-size: 1.1rem;
+            color: rgba(255,255,245,0.9);
+            font-weight: 500;
+        }
+
+        /* card styling */
+        .post-job-card {
+            background: var(--gradient-card);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            backdrop-filter: blur(2px);
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .card-body {
+            padding: 2.5rem 2.8rem;
+        }
+
+        /* section titles */
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(120deg, #4f46e5, #c2410c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 3px dotted #f0c0e8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            background: white;
+            padding: 8px;
+            border-radius: 18px;
+            color: #c026d3;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(192,38,211,0.2);
+        }
+
+        /* form labels */
+        .form-label {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: #4a4a6a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #f0defa;
+            border-radius: 18px;
+            padding: 12px 18px;
+            font-weight: 500;
+            background-color: #ffffffdd;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #c026d3;
+            box-shadow: 0 0 0 4px rgba(192, 38, 211, 0.2);
+            background: white;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon-wrap .form-control {
+            padding-left: 48px;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #c026d3;
+            font-size: 1.1rem;
+        }
+
+        /* job type pills (vibrant) */
+        .job-type-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .job-type-option input[type="radio"] {
+            display: none;
+        }
+
+        .job-type-option label {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            border: 2px solid #e2d0f5;
+            background: #fff;
+            transition: 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #422b6b;
+        }
+
+        .job-type-option input[type="radio"]:checked + label {
+            background: linear-gradient(95deg, #c026d3, #f97316);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 10px 18px -8px #c026d3;
+        }
+
+        /* skills container */
+        .skills-input-container {
+            border: 2px solid #f0defa;
+            border-radius: 20px;
+            padding: 10px 14px;
+            background: #fffffff2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 70px;
+            transition: all 0.2s;
+        }
+
+        .skills-input-container:focus-within {
+            border-color: #c026d3;
+            box-shadow: 0 0 0 4px rgba(192,38,211,0.15);
+        }
+
+        .skill-tag {
+            background: linear-gradient(120deg, #fae8ff, #ffe0f0);
+            color: #b91c9e;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            animation: bounceSoft 0.2s ease;
+        }
+
+        @keyframes bounceSoft {
+            0% { transform: scale(0.8); opacity: 0;}
+            100% { transform: scale(1); opacity: 1;}
+        }
+
+        .remove-tag {
+            background: rgba(185,28,158,0.2);
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: #b91c9e;
+        }
+
+        .remove-tag:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* apply method taps */
+        .apply-method-selector {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .apply-method-option input {
+            display: none;
+        }
+
+        .apply-method-option label {
+            background: white;
+            border: 2px solid #e9d1fa;
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4b2e6b;
+        }
+
+        .apply-method-option input:checked + label {
+            background: linear-gradient(135deg, #4f46e5, #c026d3);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 10px 18px -8px #4f46e5;
+        }
+
+        /* buttons */
+        .action-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preview {
+            background: rgba(255,255,240,0.9);
+            border: 2px solid #d9b8f0;
+            border-radius: 60px;
+            padding: 12px 30px;
+            font-weight: 700;
+            transition: 0.2s;
+            color: #7c3aed;
+        }
+
+        .btn-preview:hover {
+            background: #ffffff;
+            border-color: #c026d3;
+            transform: translateY(-3px);
+        }
+
+        .btn-post {
+            background: linear-gradient(105deg, #f97316, #c026d3);
+            border: none;
+            border-radius: 60px;
+            padding: 12px 36px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 12px 20px -12px #c026d3;
+            transition: all 0.25s;
+        }
+
+        .btn-post:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 28px -12px #c026d3;
+            background: linear-gradient(105deg, #fb923c, #d946ef);
+        }
+
+        /* info box colorful */
+        .info-box {
+            background: linear-gradient(105deg, #fef9ff, #fff0f7);
+            border-left: 8px solid #f97316;
+            border-radius: 28px;
+            padding: 18px 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .char-counter.warning { color: #f97316; font-weight: bold; }
+        .char-counter.danger { color: #ef4444; font-weight: bold; }
+
+        /* preview modal */
+        .modal-content {
+            border-radius: 32px;
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .card-body { padding: 1.5rem; }
+            .post-job-header { padding: 1.5rem; }
+            .section-title { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- minimal navbar mock (beauty) -->
+<div class="custom-navbar d-flex justify-content-between align-items-center">
+    <div>
+        <i class="fas fa-feather-alt" style="color:#c026d3; font-size: 28px;"></i>
+        <span class="fw-bold ms-2 fs-4" style="background: linear-gradient(135deg, #c026d3, #f97316); -webkit-background-clip: text; background-clip: text; color: transparent;">Here I am</span>
+    </div>
+    <div class="d-none d-md-block">
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2"><i class="fas fa-globe me-1"></i> 🌈 10k+ active talents</span>
+    </div>
+</div>
+
 <div class="post-job-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-9">
-                
-                <!-- Header -->
-                <div class="post-job-header">
-                    <h1>
-                        <i class="fas fa-bullhorn me-2"></i>Post a New Job
-                    </h1>
-                    <p>Reach thousands of qualified professionals on our platform</p>
-                </div>
-                
-                <!-- Job Form Card -->
+            <div class="col-lg-10">
                 <div class="post-job-card">
                     <div class="card-body">
-                        
-                        <!-- Info Box -->
-                        <div class="info-box">
-                            <i class="fas fa-lightbulb"></i>
-                            <p>
-                                <strong>Tip:</strong> Jobs with detailed descriptions and specific skill requirements 
-                                receive <strong>3x more applications</strong>. Be clear about what you're looking for!
-                            </p>
-                        </div>
-                        
-                        <form method="POST" action="{{ url_for('jobs.post_job') }}" id="postJobForm">
-                            
-                            <!-- ========== BASIC INFORMATION ========== -->
-                            <h5 class="section-title">
-                                <i class="fas fa-info-circle"></i> Basic Information
-                            </h5>
-                            
-                            <div class="row">
-                                <!-- Job Title -->
-                                <div class="col-md-8 mb-3">
-                                    <label class="form-label">
-                                        Job Title <span class="required">*</span>
-                                    </label>
+                        <form method="POST" action="#" id="postJobForm">
+                            <div class="row g-4">
+                                <div class="col-md-12">
+                                    <label class="form-label">Job Title <span class="text-danger">*</span></label>
                                     <div class="input-icon-wrap">
-                                        <input type="text" 
-                                               name="title" 
-                                               class="form-control" 
-                                               placeholder="e.g., Senior Python Developer"
-                                               required
-                                               id="jobTitle">
+                                        <input type="text" name="title" id="jobTitle" class="form-control" placeholder="e.g., 💎 Senior UI/UX Designer" required>
                                         <i class="fas fa-briefcase input-icon"></i>
                                     </div>
-                                </div>
-                                
-                                <!-- Job Type -->
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">
-                                        Job Type <span class="required">*</span>
-                                    </label>
-                                    <div class="job-type-selector" id="jobTypeSelector">
-                                        <div class="job-type-option">
-                                            <input type="radio" name="job_type" value="Full-time" id="typeFullTime" checked>
-                                            <label for="typeFullTime"><i class="fas fa-clock"></i> Full-time</label>
-                                        </div>
-                                        <div class="job-type-option">
-                                            <input type="radio" name="job_type" value="Part-time" id="typePartTime">
-                                            <label for="typePartTime"><i class="fas fa-hourglass-half"></i> Part-time</label>
-                                        </div>
-                                        <div class="job-type-option">
-                                            <input type="radio" name="job_type" value="Contract" id="typeContract">
-                                            <label for="typeContract"><i class="fas fa-file-contract"></i> Contract</label>
-                                        </div>
-                                        <div class="job-type-option">
-                                            <input type="radio" name="job_type" value="Remote" id="typeRemote">
-                                            <label for="typeRemote"><i class="fas fa-home"></i> Remote</label>
-                                        </div>
+                                    <label class="form-label">Job Type <span class="text-danger">*</span></label>
+                                    <div class="job-type-selector">
+                                        <div class="job-type-option"><input type="radio" name="job_type" value="Full-time" id="ftFull" checked><label for="ftFull"><i class="fas fa-clock"></i> Full-time</label></div>
+                                        <div class="job-type-option"><input type="radio" name="job_type" value="Part-time" id="ftPart"><label for="ftPart"><i class="fas fa-hourglass-half"></i> Part-time</label></div>
+                                        <div class="job-type-option"><input type="radio" name="job_type" value="Contract" id="ftContract"><label for="ftContract"><i class="fas fa-file-signature"></i> Contract</label></div>
+                                        <div class="job-type-option"><input type="radio" name="job_type" value="Remote" id="ftRemote"><label for="ftRemote"><i class="fas fa-home"></i> Remote</label></div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="row">
-                                <!-- Company -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">
-                                        Company Name <span class="required">*</span>
-                                    </label>
-                                    <div class="input-icon-wrap">
-                                        <input type="text" 
-                                               name="company" 
-                                               class="form-control" 
-                                               value="{{ user.company_name or '' }}"
-                                               placeholder="Your company name"
-                                               required>
-                                        <i class="fas fa-building input-icon"></i>
-                                    </div>
+
+                            <div class="row g-4 mt-1">
+                                <div class="col-md-6">
+                                    <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                                    <div class="input-icon-wrap"><input type="text" name="company" class="form-control" value="DreamStack Studios" placeholder="Your company name" required><i class="fas fa-building input-icon"></i></div>
                                 </div>
-                                
-                                <!-- Location -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">
-                                        Location <span class="required">*</span>
-                                    </label>
-                                    <div class="input-icon-wrap">
-                                        <input type="text" 
-                                               name="location" 
-                                               class="form-control" 
-                                               placeholder="e.g., Bangalore, Karnataka (or Remote)"
-                                               required>
-                                        <i class="fas fa-map-marker-alt input-icon"></i>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Location <span class="text-danger">*</span></label>
+                                    <div class="input-icon-wrap"><input type="text" name="location" class="form-control" placeholder="🌍 Bangalore / Remote / Hybrid" required><i class="fas fa-map-marker-alt input-icon"></i></div>
                                 </div>
                             </div>
-                            
-                            <div class="row">
-                                <!-- Salary Range -->
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Salary Range</label>
+
+                            <div class="row g-4 mt-1">
+                                <div class="col-md-6">
+                                    <label class="form-label">💰 Salary Range</label>
                                     <select name="salary_range" class="form-select">
-                                        <option value="">Select salary range</option>
-                                        <option value="Not Disclosed">Not Disclosed</option>
-                                        <option value="0-3 LPA">0-3 LPA</option>
-                                        <option value="3-6 LPA">3-6 LPA</option>
-                                        <option value="6-10 LPA">6-10 LPA</option>
-                                        <option value="10-15 LPA">10-15 LPA</option>
-                                        <option value="15-25 LPA">15-25 LPA</option>
-                                        <option value="25-50 LPA">25-50 LPA</option>
-                                        <option value="50+ LPA">50+ LPA</option>
-                                        <option value="Negotiable">Negotiable</option>
+                                        <option value="Not Disclosed">🌈 Not Disclosed</option>
+                                        <option value="3-6 LPA">3-6 LPA</option><option value="6-10 LPA">6-10 LPA</option>
+                                        <option value="10-15 LPA">10-15 LPA</option><option value="15-25 LPA">15-25 LPA</option>
+                                        <option value="25-50 LPA">25-50 LPA</option><option value="50+ LPA">50+ LPA</option>
+                                        <option value="Negotiable">Negotiable 💎</option>
                                     </select>
                                 </div>
-                                
-                                <!-- Experience Required -->
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-6">
                                     <label class="form-label">Experience Required</label>
                                     <select name="experience_required" class="form-select">
-                                        <option value="">Select experience</option>
-                                        <option value="Fresher">Fresher (0 years)</option>
-                                        <option value="0-1 year">0-1 year</option>
-                                        <option value="1-3 years">1-3 years</option>
-                                        <option value="3-5 years">3-5 years</option>
-                                        <option value="5-8 years">5-8 years</option>
-                                        <option value="8-12 years">8-12 years</option>
-                                        <option value="12+ years">12+ years</option>
+                                        <option value="Fresher">Fresher (0 years)</option><option value="1-3 years">1-3 years</option>
+                                        <option value="3-5 years">3-5 years</option><option value="5-8 years">5-8 years</option>
+                                        <option value="8-12 years">8-12 years</option><option value="12+ years">12+ years</option>
                                     </select>
                                 </div>
                             </div>
-                            
-                            <!-- ========== JOB DETAILS ========== -->
-                            <h5 class="section-title mt-4">
-                                <i class="fas fa-align-left"></i> Job Details
-                            </h5>
-                            
-                            <!-- Description -->
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Job Description <span class="required">*</span>
-                                </label>
-                                <textarea name="description" 
-                                          class="form-control" 
-                                          rows="5" 
-                                          placeholder="Describe the role, responsibilities, and what a typical day looks like..."
-                                          required
-                                          id="jobDescription"
-                                          maxlength="3000"></textarea>
-                                <div class="char-counter" id="descCounter">0/3000 characters</div>
+
+                            <!-- JOB DETAILS SECTION -->
+                                <div class="mb-3">
+                                <label class="form-label">📝 Job Description <span class="text-danger">*</span></label>
+                                <textarea name="description" id="jobDescription" class="form-control" rows="5" placeholder="Describe the role: day-to-day tasks, culture, growth opportunities ..." required maxlength="3000"></textarea>
+                                <div class="char-counter text-end mt-1" id="descCounter">0/3000 characters</div>
                             </div>
-                            
-                            <!-- Requirements -->
                             <div class="mb-3">
-                                <label class="form-label">Requirements / Qualifications</label>
-                                <textarea name="requirements" 
-                                          class="form-control" 
-                                          rows="4" 
-                                          placeholder="e.g.,&#10;- Bachelor's degree in Computer Science&#10;- 3+ years of experience in web development&#10;- Strong problem-solving skills"
-                                          id="jobRequirements"
-                                          maxlength="2000"></textarea>
-                                <div class="char-counter" id="reqCounter">0/2000 characters</div>
+                                <label class="form-label">✅ Requirements / Qualifications</label>
+                                <textarea name="requirements" id="jobRequirements" class="form-control" rows="4" placeholder="e.g.,&#10;• 3+ years in React & Node&#10;• Bachelor’s in CS or equivalent&#10;• Passion for pixel-perfect UI" maxlength="2000"></textarea>
+                                <div class="char-counter text-end mt-1" id="reqCounter">0/2000 characters</div>
                             </div>
-                            
-                            <!-- Skills Required -->
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    Skills Required <span class="required">*</span>
-                                </label>
+
+                            <!-- Skills -->
+                            <div class="mb-4">
+                                <label class="form-label">🔖 Skills Required <span class="text-danger">*</span></label>
                                 <div class="skills-input-container" id="skillsContainer">
-                                    <input type="text" 
-                                           class="skills-input" 
-                                           placeholder="Type a skill and press Enter or comma..."
-                                           id="skillsInput">
+                                    <input type="text" class="skills-input" id="skillsInput" placeholder="Type skill (e.g., React, Python, Figma) and press Enter ...">
                                 </div>
                                 <input type="hidden" name="skills_required" id="skillsHidden">
-                                <small class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>Press <strong>Enter</strong> or <strong>comma (,)</strong> to add each skill
-                                </small>
+                                <small class="text-muted"><i class="fas fa-arrow-right me-1 text-pink"></i> Press <kbd>Enter</kbd> or <kbd>,</kbd> to add colorful skill tags</small>
                             </div>
-                            
-                            <!-- ========== HOW TO APPLY ========== -->
-                            <h5 class="section-title mt-4">
-                                <i class="fas fa-paper-plane"></i> How to Apply
-                            </h5>
-                            
-                            <p class="text-muted small mb-3">Choose how candidates should apply for this position</p>
-                            
-                            <!-- Apply Method -->
+
+                            <!-- APPLY METHOD -->
+                            <div class="section-title mt-2"><i class="fas fa-paper-plane"></i> How to apply</div>
                             <div class="apply-method-selector" id="applyMethodSelector">
-                                <div class="apply-method-option">
-                                    <input type="radio" name="apply_method" value="email" id="methodEmail" checked>
-                                    <label for="methodEmail">
-                                        <i class="fas fa-envelope"></i> Via Email
-                                    </label>
-                                </div>
-                                <div class="apply-method-option">
-                                    <input type="radio" name="apply_method" value="website" id="methodWebsite">
-                                    <label for="methodWebsite">
-                                        <i class="fas fa-globe"></i> Via Website
-                                    </label>
-                                </div>
-                                <div class="apply-method-option">
-                                    <input type="radio" name="apply_method" value="both" id="methodBoth">
-                                    <label for="methodBoth">
-                                        <i class="fas fa-check-double"></i> Both
-                                    </label>
-                                </div>
+                                <div class="apply-method-option"><input type="radio" name="apply_method" value="email" id="methodEmail" checked><label for="methodEmail"><i class="fas fa-envelope"></i> 📧 Email</label></div>
+                                <div class="apply-method-option"><input type="radio" name="apply_method" value="website" id="methodWebsite"><label for="methodWebsite"><i class="fas fa-globe"></i> 🌐 Website</label></div>
+                                <div class="apply-method-option"><input type="radio" name="apply_method" value="both" id="methodBoth"><label for="methodBoth"><i class="fas fa-check-double"></i> ✨ Both</label></div>
                             </div>
-                            
                             <div class="row" id="applyFields">
-                                <!-- Apply Email -->
                                 <div class="col-md-6 mb-3" id="emailField">
-                                    <label class="form-label">
-                                        Application Email <span class="required">*</span>
-                                    </label>
-                                    <div class="input-icon-wrap">
-                                        <input type="email" 
-                                               name="apply_email" 
-                                               class="form-control" 
-                                               value="{{ user.email or '' }}"
-                                               placeholder="hr@yourcompany.com">
-                                        <i class="fas fa-envelope input-icon"></i>
-                                    </div>
+                                    <label class="form-label">Application Email <span class="text-danger">*</span></label>
+                                    <div class="input-icon-wrap"><input type="email" name="apply_email" class="form-control" value="careers@hereiam.com" placeholder="hr@company.com"><i class="fas fa-envelope input-icon"></i></div>
                                 </div>
-                                
-                                <!-- Apply Website -->
                                 <div class="col-md-6 mb-3" id="websiteField" style="display: none;">
-                                    <label class="form-label">
-                                        Application URL <span class="required">*</span>
-                                    </label>
-                                    <div class="input-icon-wrap">
-                                        <input type="url" 
-                                               name="apply_website" 
-                                               class="form-control" 
-                                               placeholder="https://yourcompany.com/careers/job-id">
-                                        <i class="fas fa-link input-icon"></i>
-                                    </div>
+                                    <label class="form-label">Application URL <span class="text-danger">*</span></label>
+                                    <div class="input-icon-wrap"><input type="url" name="apply_website" class="form-control" placeholder="https://company.com/careers"><i class="fas fa-link input-icon"></i></div>
                                 </div>
                             </div>
-                            
-                            <!-- Action Buttons -->
+
                             <div class="action-buttons">
-                                <button type="button" class="btn btn-preview" onclick="previewJob()">
-                                    <i class="fas fa-eye"></i> Preview
-                                </button>
-                                <button type="submit" class="btn btn-post" id="postJobBtn">
-                                    <i class="fas fa-rocket"></i> Post Job Now
-                                </button>
+                                <button type="button" class="btn-preview" onclick="previewJob()"><i class="fas fa-eye me-2"></i>Preview</button>
+                                <button type="submit" class="btn-post" id="postJobBtn"><i class="fas fa-rocket me-2"></i>Post Job ✨</button>
                             </div>
-                            
                         </form>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>
 </div>
 
-<!-- Preview Modal -->
+<!-- Preview Modal Popup (colorful) -->
 <div class="modal fade" id="previewModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header" style="background: var(--gradient-dark); color: white; border-radius: 16px 16px 0 0;">
-                <h5 class="modal-title"><i class="fas fa-eye me-2"></i>Job Preview</h5>
+        <div class="modal-content" style="border-radius: 38px;">
+            <div class="modal-header" style="background: linear-gradient(115deg, #4f46e5, #db2777); color: white; border-radius: 38px 38px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fas fa-eye me-2"></i>✨ Job Preview ✨</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4" id="previewContent"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-post" onclick="document.getElementById('postJobForm').submit();">
-                    <i class="fas fa-rocket me-1"></i> Post Job
-                </button>
+            <div class="modal-body p-4" id="previewContent" style="background: #fefcf5;"></div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn-post" onclick="document.getElementById('postJobForm').submit();">🚀 Post Job Now</button>
             </div>
         </div>
     </div>
 </div>
 
-{% endblock %}
-
-{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // ============================================================
-    // SKILLS TAG INPUT
-    // ============================================================
+    // -------------------- SKILLS LOGIC (colorful tags) --------------------
     const skillsContainer = document.getElementById('skillsContainer');
     const skillsInput = document.getElementById('skillsInput');
     const skillsHidden = document.getElementById('skillsHidden');
-    let skills = [];
-    
+    let skillsArray = [];
+
     skillsInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
-            addSkill();
+            addSkillFromInput();
         }
-        // Backspace to remove last skill
-        if (e.key === 'Backspace' && this.value === '' && skills.length > 0) {
-            removeSkill(skills.length - 1);
+        if (e.key === 'Backspace' && this.value === '' && skillsArray.length > 0) {
+            removeSkill(skillsArray.length - 1);
         }
     });
-    
+
     skillsInput.addEventListener('blur', function() {
-        if (this.value.trim()) {
-            addSkill();
-        }
+        if (this.value.trim()) addSkillFromInput();
     });
-    
-    skillsContainer.addEventListener('click', function() {
-        skillsInput.focus();
-    });
-    
-    function addSkill() {
-        const skill = skillsInput.value.replace(',', '').trim();
-        if (skill && !skills.includes(skill)) {
-            skills.push(skill);
-            renderSkills();
+
+    function addSkillFromInput() {
+        let raw = skillsInput.value.replace(/,/g, '').trim();
+        if (raw && !skillsArray.includes(raw)) {
+            skillsArray.push(raw);
+            renderSkillsTags();
         }
         skillsInput.value = '';
-        updateHiddenField();
+        updateHiddenSkills();
     }
-    
+
     function removeSkill(index) {
-        skills.splice(index, 1);
-        renderSkills();
-        updateHiddenField();
+        skillsArray.splice(index, 1);
+        renderSkillsTags();
+        updateHiddenSkills();
         skillsInput.focus();
     }
-    
-    function renderSkills() {
-        // Remove existing tags
-        skillsContainer.querySelectorAll('.skill-tag').forEach(tag => tag.remove());
-        
-        // Add tags before input
-        skills.forEach((skill, index) => {
-            const tag = document.createElement('span');
-            tag.className = 'skill-tag';
-            tag.innerHTML = `
-                ${skill}
-                <button type="button" class="remove-tag" onclick="removeSkill(${index})" title="Remove">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            skillsContainer.insertBefore(tag, skillsInput);
+
+    function renderSkillsTags() {
+        document.querySelectorAll('.skill-tag').forEach(el => el.remove());
+        skillsArray.forEach((skill, i) => {
+            const tagSpan = document.createElement('span');
+            tagSpan.className = 'skill-tag';
+            tagSpan.innerHTML = `${skill} <button type="button" class="remove-tag" onclick="removeSkill(${i})"><i class="fas fa-times"></i></button>`;
+            skillsContainer.insertBefore(tagSpan, skillsInput);
         });
     }
-    
-    function updateHiddenField() {
-        skillsHidden.value = skills.join(', ');
+
+    function updateHiddenSkills() {
+        skillsHidden.value = skillsArray.join(', ');
+        if(skillsArray.length === 0) skillsHidden.value = '';
     }
-    
-    // ============================================================
-    // APPLY METHOD TOGGLE
-    // ============================================================
-    const methodEmail = document.getElementById('methodEmail');
-    const methodWebsite = document.getElementById('methodWebsite');
-    const methodBoth = document.getElementById('methodBoth');
-    const emailField = document.getElementById('emailField');
-    const websiteField = document.getElementById('websiteField');
-    
+
+    // Apply method dynamic fields
+    const radioEmail = document.getElementById('methodEmail');
+    const radioWeb = document.getElementById('methodWebsite');
+    const radioBoth = document.getElementById('methodBoth');
+    const emailDiv = document.getElementById('emailField');
+    const websiteDiv = document.getElementById('websiteField');
+
     function toggleApplyFields() {
-        if (methodBoth.checked) {
-            emailField.style.display = 'block';
-            websiteField.style.display = 'block';
-        } else if (methodWebsite.checked) {
-            emailField.style.display = 'none';
-            websiteField.style.display = 'block';
+        if (radioBoth.checked) {
+            emailDiv.style.display = 'block';
+            websiteDiv.style.display = 'block';
+        } else if (radioWeb.checked) {
+            emailDiv.style.display = 'none';
+            websiteDiv.style.display = 'block';
         } else {
-            emailField.style.display = 'block';
-            websiteField.style.display = 'none';
+            emailDiv.style.display = 'block';
+            websiteDiv.style.display = 'none';
         }
     }
-    
-    methodEmail.addEventListener('change', toggleApplyFields);
-    methodWebsite.addEventListener('change', toggleApplyFields);
-    methodBoth.addEventListener('change', toggleApplyFields);
-    
-    // Initialize
+    radioEmail.addEventListener('change', toggleApplyFields);
+    radioWeb.addEventListener('change', toggleApplyFields);
+    radioBoth.addEventListener('change', toggleApplyFields);
     toggleApplyFields();
-    
-    // ============================================================
-    // CHARACTER COUNTERS
-    // ============================================================
-    function setupCharCounter(textareaId, counterId, maxLength) {
-        const textarea = document.getElementById(textareaId);
-        const counter = document.getElementById(counterId);
-        
-        textarea.addEventListener('input', function() {
-            const length = this.value.length;
-            counter.textContent = `${length}/${maxLength} characters`;
-            counter.classList.remove('warning', 'danger');
-            if (length > maxLength * 0.8) counter.classList.add('warning');
-            if (length > maxLength * 0.95) counter.classList.add('danger');
+
+    // Character counters
+    function charCounter(textId, spanId, limit) {
+        const textarea = document.getElementById(textId);
+        const span = document.getElementById(spanId);
+        textarea.addEventListener('input', () => {
+            let len = textarea.value.length;
+            span.innerText = `${len}/${limit} characters`;
+            if (len > limit * 0.8) span.classList.add('warning'); else span.classList.remove('warning');
+            if (len > limit * 0.95) span.classList.add('danger'); else span.classList.remove('danger');
         });
     }
-    
-    setupCharCounter('jobDescription', 'descCounter', 3000);
-    setupCharCounter('jobRequirements', 'reqCounter', 2000);
-    
-    // ============================================================
-    // FORM VALIDATION
-    // ============================================================
-    const postJobForm = document.getElementById('postJobForm');
-    
-    postJobForm.addEventListener('submit', function(e) {
+    charCounter('jobDescription', 'descCounter', 3000);
+    charCounter('jobRequirements', 'reqCounter', 2000);
+
+    // Form validation & preview
+    const postBtn = document.getElementById('postJobBtn');
+    const form = document.getElementById('postJobForm');
+
+    form.addEventListener('submit', function(e) {
         const title = document.getElementById('jobTitle').value.trim();
-        const description = document.getElementById('jobDescription').value.trim();
-        
-        if (!title) {
-            alert('Please enter a job title');
-            e.preventDefault();
-            return;
+        const desc = document.getElementById('jobDescription').value.trim();
+        if (!title) { alert('🌸 Please add a job title!'); e.preventDefault(); return; }
+        if (!desc) { alert('✨ Job description is required to attract candidates ✨'); e.preventDefault(); return; }
+        if (skillsArray.length === 0) { alert('🎯 At least one skill required — add a skill tag!'); e.preventDefault(); return; }
+        if (radioEmail.checked && !document.querySelector('[name="apply_email"]').value.trim()) { alert('📧 Please provide application email.'); e.preventDefault(); return; }
+        if (radioWeb.checked && !document.querySelector('[name="apply_website"]').value.trim()) { alert('🌐 Please provide website URL.'); e.preventDefault(); return; }
+        if (radioBoth.checked && (!document.querySelector('[name="apply_email"]').value.trim() || !document.querySelector('[name="apply_website"]').value.trim())) {
+            alert('✨ Both email and website are required for both method'); e.preventDefault(); return;
         }
-        
-        if (!description) {
-            alert('Please enter a job description');
-            e.preventDefault();
-            return;
-        }
-        
-        if (skills.length === 0) {
-            alert('Please add at least one required skill');
-            e.preventDefault();
-            return;
-        }
-        
-        // Update hidden field before submit
-        updateHiddenField();
-        
-        // Show loading
-        const btn = document.getElementById('postJobBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Posting Job...';
+        updateHiddenSkills();
+        postBtn.disabled = true;
+        postBtn.innerHTML = '<i class="fas fa-spinner fa-pulse me-2"></i>Posting Magic...';
     });
-    
-    // ============================================================
-    // PREVIEW FUNCTION
-    // ============================================================
-    function previewJob() {
-        const title = document.getElementById('jobTitle').value || 'Job Title';
-        const company = document.querySelector('[name="company"]').value || 'Company Name';
-        const location = document.querySelector('[name="location"]').value || 'Location';
-        const salary = document.querySelector('[name="salary_range"]').value || 'Not Disclosed';
+
+    window.previewJob = function() {
+        const title = document.getElementById('jobTitle').value || 'Amazing Job Role';
+        const company = document.querySelector('[name="company"]').value || 'Cool Company';
+        const location = document.querySelector('[name="location"]').value || 'Worldwide Remote';
+        const salary = document.querySelector('[name="salary_range"]').value || '✨ Best in Industry';
         const jobType = document.querySelector('[name="job_type"]:checked')?.value || 'Full-time';
-        const experience = document.querySelector('[name="experience_required"]').value || 'Not Specified';
-        const description = document.getElementById('jobDescription').value || 'No description provided.';
+        const exp = document.querySelector('[name="experience_required"]').value || 'Any level';
+        const description = document.getElementById('jobDescription').value || 'Describe your awesome workplace...';
         const requirements = document.getElementById('jobRequirements').value || '';
+        const skillsPreview = skillsArray.length ? skillsArray.map(s => `<span class="badge bg-gradient" style="background: linear-gradient(145deg, #f0c0e8, #ffe0f5); color:#a8229a; padding:8px 16px; border-radius: 40px; margin:4px;">${escapeHtml(s)}</span>`).join(' ') : '<span class="text-muted">🌟 No skills added</span>';
         
-        const previewContent = document.getElementById('previewContent');
-        previewContent.innerHTML = `
-            <div class="p-3">
-                <h3 class="fw-bold mb-1">${escapeHtml(title)}</h3>
-                <p class="text-primary fw-bold mb-3">${escapeHtml(company)}</p>
-                
-                <div class="d-flex flex-wrap gap-3 mb-3 text-muted small">
-                    <span><i class="fas fa-map-marker-alt me-1"></i>${escapeHtml(location)}</span>
-                    <span><i class="fas fa-rupee-sign me-1"></i>${escapeHtml(salary)}</span>
-                    <span><i class="fas fa-briefcase me-1"></i>${escapeHtml(experience)}</span>
-                    <span><i class="fas fa-clock me-1"></i>${escapeHtml(jobType)}</span>
+        const modalContent = document.getElementById('previewContent');
+        modalContent.innerHTML = `
+            <div class="p-2">
+                <h2 class="fw-bold" style="color:#6b21a5;">${escapeHtml(title)}</h2>
+                <p class="fs-5 fw-semibold" style="color:#f97316;">${escapeHtml(company)}</p>
+                <div class="d-flex flex-wrap gap-3 border-bottom pb-3 mb-3">
+                    <span><i class="fas fa-map-marker-alt text-purple"></i> ${escapeHtml(location)}</span>
+                    <span><i class="fas fa-coins text-warning"></i> ${escapeHtml(salary)}</span>
+                    <span><i class="fas fa-briefcase text-info"></i> ${escapeHtml(exp)}</span>
+                    <span><i class="fas fa-calendar-alt"></i> ${escapeHtml(jobType)}</span>
                 </div>
-                
-                <h5 class="fw-bold mt-4">Description</h5>
-                <p>${escapeHtml(description).replace(/\n/g, '<br>')}</p>
-                
-                ${requirements ? `<h5 class="fw-bold mt-4">Requirements</h5><p>${escapeHtml(requirements).replace(/\n/g, '<br>')}</p>` : ''}
-                
-                <h5 class="fw-bold mt-4">Required Skills</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    ${skills.map(s => `<span class="badge bg-light text-dark border">${escapeHtml(s)}</span>`).join('') || '<span class="text-muted">No skills added</span>'}
-                </div>
+                <div class="mt-3"><strong class="fs-6">📌 Description</strong><p class="mt-1">${escapeHtml(description).replace(/\n/g, '<br>')}</p></div>
+                ${requirements ? `<div class="mt-3"><strong>✅ Requirements</strong><p>${escapeHtml(requirements).replace(/\n/g, '<br>')}</p></div>` : ''}
+                <div class="mt-3"><strong>🔧 Skills needed</strong><div class="d-flex flex-wrap gap-2 mt-2">${skillsPreview}</div></div>
+                <div class="alert alert-light mt-4 border-start border-4 border-success"><i class="fas fa-heart text-danger"></i> Excited to apply? This job will go live after posting!</div>
             </div>
         `;
-        
-        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-        modal.show();
-    }
+        const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+        previewModal.show();
+    };
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
     
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
-    // ============================================================
-    // KEYBOARD SHORTCUTS
-    // ============================================================
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+Enter to submit
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            if (document.activeElement && document.activeElement.closest('#postJobForm')) {
-                postJobForm.dispatchEvent(new Event('submit'));
-            }
+    // initial helper to add some dummy skills for demo? optional but not needed
+    // But adding default skill example beautiful?
+    setTimeout(() => {
+        if(skillsArray.length === 0) {
+            skillsArray.push('JavaScript', 'Teamwork', 'Creativity');
+            renderSkillsTags();
+            updateHiddenSkills();
         }
-    });
+    }, 100);
 </script>
-{% endblock %}
+</body>
+</html>

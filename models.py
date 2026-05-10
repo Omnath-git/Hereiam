@@ -1,10 +1,17 @@
+# models.py
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 db = SQLAlchemy()
 
+# ============================================================
+# MAIN DATABASE - Users, Admin, Donations, Scraper Config
+# ============================================================
+
 class User(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database
     __tablename__ = 'user'
+    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     mobile = db.Column(db.String(20), unique=True, nullable=False)
@@ -39,10 +46,85 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     profile_url = db.Column(db.String(200), default='')
 
-class Job(db.Model):
-    __tablename__ = 'job'
+
+class Admin(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database
+    __tablename__ = 'admin'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(100), default='Admin')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class Donation(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database
+    __tablename__ = 'donation'
+    
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    employer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    donor_name = db.Column(db.String(100))
+    donor_email = db.Column(db.String(120))
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    payment_method = db.Column(db.String(50))
+    message = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ScrapeWebsite(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database (scraper config)
+    __tablename__ = 'scrape_website'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    base_url = db.Column(db.String(500), nullable=False)
+    card_selectors = db.Column(db.Text, default='[]')
+    title_selectors = db.Column(db.Text, default='[]')
+    company_selectors = db.Column(db.Text, default='[]')
+    location_selectors = db.Column(db.Text, default='[]')
+    link_selector = db.Column(db.String(200), default='a')
+    is_static_url = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    last_scraped = db.Column(db.DateTime, nullable=True)
+    jobs_found = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ScrapeKeyword(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database
+    __tablename__ = 'scrape_keyword'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    category = db.Column(db.String(100), default='general')
+    keyword = db.Column(db.String(200), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class ScrapeLocation(db.Model):
+    __bind_key__ = 'main'  # ⭐ Main database
+    __tablename__ = 'scrape_location'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    location = db.Column(db.String(200), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    priority = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# ============================================================
+# JOBS DATABASE - Separate to avoid locking with user operations
+# ============================================================
+
+class Job(db.Model):
+    __bind_key__ = 'jobs'  # ⭐⭐ SEPARATE JOBS DATABASE ⭐⭐
+    __tablename__ = 'job'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    employer_id = db.Column(db.Integer, nullable=True)
     title = db.Column(db.String(200), nullable=False)
     company = db.Column(db.String(200), nullable=False)
     location = db.Column(db.String(200), default='')
@@ -61,60 +143,8 @@ class Job(db.Model):
     posted_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
     views = db.Column(db.Integer, default=0)
-
-class Donation(db.Model):
-    __tablename__ = 'donation'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    donor_name = db.Column(db.String(100))
-    donor_email = db.Column(db.String(120))
-    amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default='pending')
-    payment_method = db.Column(db.String(50))
-    message = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class ScrapeWebsite(db.Model):
-    __tablename__ = 'scrape_website'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(100), nullable=False)
-    base_url = db.Column(db.String(500), nullable=False)
-    card_selectors = db.Column(db.Text, default='[]')
-    title_selectors = db.Column(db.Text, default='[]')
-    company_selectors = db.Column(db.Text, default='[]')
-    location_selectors = db.Column(db.Text, default='[]')
-    link_selector = db.Column(db.String(200), default='a')
-    is_static_url = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=True)
-    priority = db.Column(db.Integer, default=1)
-    last_scraped = db.Column(db.DateTime, nullable=True)
-    jobs_found = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class ScrapeKeyword(db.Model):
-    __tablename__ = 'scrape_keyword'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    category = db.Column(db.String(100), default='general')
-    keyword = db.Column(db.String(200), nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
-    priority = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class ScrapeLocation(db.Model):
-    __tablename__ = 'scrape_location'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    location = db.Column(db.String(200), nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
-    priority = db.Column(db.Integer, default=1)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Admin(db.Model):
-    __tablename__ = 'admin'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    name = db.Column(db.String(100), default='Admin')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 class ScrapeDesignation(db.Model):
+    __bind_key__ = 'main'
     __tablename__ = 'scrape_designation'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -122,3 +152,12 @@ class ScrapeDesignation(db.Model):
     category = db.Column(db.String(100), default='')
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+# models.py में जोड़ें
+
+class District(db.Model):
+    __bind_key__ = 'main'
+    __tablename__ = 'district'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    district_name = db.Column(db.String(200), nullable=False)
+    state_name = db.Column(db.String(200), nullable=False)
