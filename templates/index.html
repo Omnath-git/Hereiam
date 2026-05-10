@@ -1,6 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Here I am - Jobs & Talent{% endblock %}
+<!-- {% block title %}Here I Am - Free Job Portal | Find Jobs & Hire Talent{% endblock %} -->
+
+{% block meta_description %}Here I Am is India's free job portal. Find thousands of jobs across all sectors - IT, Healthcare, Education, Government. Create your professional profile, upload CV, and get hired. Free for job seekers and employers.{% endblock %}
+
+{% block meta_keywords %}job portal, free jobs, India jobs, IT jobs, government jobs, naukri, recruitment, hire talent, CV upload, professional profile, job search, employment{% endblock %}
+
+{% block og_title %}Here I Am - Free Job Portal | Find Jobs & Hire Talent{% endblock %}
+
+{% block og_description %}Find thousands of jobs across India. Create your free professional profile and connect with top employers.{% endblock %}
+
+{% block og_image %}{{ url_for('static', filename='images/og-image.png') }}{% endblock %}
+
+{% block twitter_title %}Here I Am - Free Job Portal | Find Jobs & Hire Talent{% endblock %}
+
+{% block twitter_description %}Find thousands of jobs across India. Create your free professional profile and connect with top employers.{% endblock %}
+
+{% block twitter_image %}{{ url_for('static', filename='images/twitter-card.png') }}{% endblock %}
+<!-- H1 Heading SEO के लिए सबसे जरूरी -->
+<!-- <h1 style="display:none;">Here I Am - Free Job Portal & Professional Network India</h1> -->
 
 {% block extra_css %}
 <style>

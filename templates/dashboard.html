@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Here I Am{% endblock %}
+{% block title %}Dashboard - Here I Am | Manage Your Profile{% endblock %}
+
+{% block meta_description %}Manage your professional profile, upload CV, track job applications, and connect with employers. Your personal dashboard on Here I Am.{% endblock %}
+
+{% block content %}
+<h1>My Dashboard</h1>
 
 {% block extra_css %}
 <style>
@@ -79,7 +84,7 @@
                     {% if user.profile_photo %}
                     <img src="{{ url_for('static', filename=user.profile_photo) }}" 
                          alt="{{ user.full_name }}" class="dashboard-avatar mb-2"
-                         onerror="this.src='{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}'">
+                         onerror='this.src="{{ url_for("static", filename="uploads/profile_photos/avatar.png") }}";'>
                     {% else %}
                     <img src="{{ url_for('static', filename='uploads/profile_photos/avatar.png') }}" 
                          alt="Avatar" class="dashboard-avatar mb-2">

@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from config import Config
 from models import db
 import os
@@ -23,7 +23,9 @@ def create_app():
     from blueprints.admin import admin_bp
     from blueprints.admin_scraper import admin_scraper_bp
     from blueprints.donate import donate_bp
+    from blueprints.seo import seo_bp
     
+    app.register_blueprint(seo_bp)  
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(dashboard_bp)
@@ -33,7 +35,8 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(admin_scraper_bp)
     app.register_blueprint(donate_bp)
-    
+
+
     # Start scraper
     start_job_scraper(app)
     

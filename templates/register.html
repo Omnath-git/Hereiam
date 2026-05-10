@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Here I Am{% endblock %}
+{% block title %}Register Free - Here I Am | Create Professional Profile{% endblock %}
+
+{% block meta_description %}Create your free account on Here I Am. Register as job seeker or employer. Upload CV, build professional profile, and find your dream job. 100% free.{% endblock %}
+
+{% block meta_keywords %}register free, create account, job seeker registration, employer registration, free profile, CV upload, professional network{% endblock %}
+
+{% block content %}
+<h1 class="register-heading">Create Your Free Account</h1>
 
 {% block extra_css %}
 <style>
@@ -225,6 +232,7 @@
     .register-footer p { color: #64748b; font-size: 0.9rem; margin: 0; }
     .register-footer a {
         background: linear-gradient(135deg, #8b5cf6, #6366f1);
+        background-clip: text;
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         font-weight: 700;
     }
@@ -250,7 +258,6 @@
 </style>
 {% endblock %}
 
-{% block content %}
 <div class="register-container">
     <div class="container">
         <div class="row justify-content-center">
